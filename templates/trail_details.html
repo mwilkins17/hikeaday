@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+
+
+
+<div style="color: white">
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Trail Name: {{trail.name}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Area Name: {{trail.area_name}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">City: {{trail.city_name}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">State: {{trail.state_name}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Popularity: {{trail.popularity}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Trail Length: {{trail.length}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Elevation Gain: {{trail.elevation_gain}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Difficulty Rating: {{trail.difficulty_rating}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Route Type: {{trail.route_type}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Visitor Usage: {{trail.visitor_usage}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Average Rating: {{trail.average_rating}}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Number of Reviews: {{trail.num_reviews}}</p>
+    <p style="background:white; color: black; font-size:2em;border-radius:10px; border-color: black;">Features:{% for feature in features %} {{feature}}<br> {% endfor %}</p>
+    <p style="background:white; color: black; font-size:1.5em;border-radius:10px; border-color: black;">Activities:{% for activity in activities %} {{activity}}<br> {% endfor %}</p>
+</div>
+
+
+{% if reviews %}
+    {% for review in reviews %}
+        <div style="text-align:center">
+            <p style="color:black; text-align: center; background-color: white; border-radius: 15px; width:30%; height:auto;">{{review}}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if reviewed %}
+<form style="text-align:center;" method="POST" action="/trails/{{trail.name}}">
+    <textarea style="height: 100px; width: 50%; text-align: center" name="edit-review" type="text">{{review_text}}</textarea><br>
+    <input style="width:50%" type="Submit" value="Edit Review" />
+</form>
+
+<form style="text-align:center;" method="POST" action="/trails/delete-post">
+    <input style="width:50%" id="review-submit-reviewed" name="delete-review" type="Submit" Value="Delete Review" />
+</form>
+
+{% elif session['user_id'] %}
+
+<form style="text-align:center;" method="POST" action="/trails/{{trail.name}}">
+
+    <textarea style="height: 100px; width: 50%; text-align: center" name="new-review" 
+    type="text" placeholder="Please type your review here..."></textarea><br>
+
+    <input style="width:50%" type="Submit" value="Submit Review" />
+</form>
+
+{% else %}
+
+{% endif %}
+
+
+{% endblock %}

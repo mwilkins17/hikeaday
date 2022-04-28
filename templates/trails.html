@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+<form action="/trails" class="search--form" method="POST">
+  <input name="trail_search" class="search--input" type="search" placeholder="Search here...">
+</form>
+<div style="align-items: center;">
+  <div style="text-align:left; display:block; height: 35%; width: fit-content;background-color:white; overflow:scroll; margin-top:15px; color:white" id="trail-click" >
+      {% for result in results %}
+        <a style="text-align:center" href="/trails/{{result.name}}">{{result.name}}</a><br>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}

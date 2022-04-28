@@ -1,0 +1,250 @@
+.header {
+  height: 160px;
+  padding-top: 0.8em;
+  text-align: center;
+  font-size: 3em;
+  background-size: 220px 210px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+img {
+  /* width: 100%; */
+}
+
+body {
+  text-align: center;
+  background-image: url(/static/img/background-hiking.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #cccccc;
+  font-family: 'Manrope', sans-serif;
+}
+
+div {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.topnav {
+  font-size: 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+  width: 95%;
+  margin: auto;
+  padding: 10px;
+  background-color: rgb(255, 255, 255);
+  text-align: center;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content:space-around;
+
+}
+
+.rightnav {
+  width: auto;
+  display: block;
+  justify-content: flex-end;
+  align-items: right;
+  text-align: right;
+  float: right;
+  margin-right: 15px;
+}
+
+.middlenav {
+  font-family: 'Manrope', sans-serif;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  display: block;
+  border: 1px solid rgb(0, 0, 0);
+  float: none;
+  position: relative;
+  margin: auto;
+
+
+}
+
+.leftnav {
+  width: auto;
+  display: block;
+  justify-content: auto;
+  text-align: left;
+  float: left;
+  margin-left: 15px;
+}
+
+.nav-btn {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.search-bar {
+  display: block;
+  text-align: center;
+  color: black;
+  background-color: white;
+  border-color: white;
+  padding: 10px;
+  margin-top: 20px;
+  margin-right: auto;
+  margin-left: auto;
+  width: 75%;
+}
+
+.search--form {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.search--input {
+  width: 50%;
+  height: 50px;
+  text-align: center;
+}
+
+.search-page-action-bar {
+
+}
+
+.favorite {
+  width: 25px;
+  cursor: pointer;
+}
+
+
+h10 {
+  display: block;
+  font-size: 14px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+placeholder {
+  text-align: center;
+  font-family: 'Manrope', sans-serif;
+  color: black;
+}
+
+a:link {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+}
+
+a:visited {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+}
+
+a:hover {
+
+  color: rgb(255, 0, 179);
+  background-color: white;
+  text-decoration: none;
+
+}
+
+a:active {
+  color: red;
+  text-decoration: none;
+}
+
+.sign-up.input {
+  display: inline-block;
+}
+
+.text-uppercase.text-center {
+  text-align: center;
+  display: block;
+  
+}
+
+.sign-in.input {
+  display: inline-block;  
+}
+
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+       #map {
+        height: 100%;
+      }
+      
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+      }
+      
+      #infowindow-content .title {
+        font-weight: bold;
+      }
+      
+      #infowindow-content {
+        display: none;
+      }
+      
+      #map #infowindow-content {
+        display: inline;
+      }
+      
+      .pac-card {
+        background-color: #fff;
+        border: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        padding: 0 0.5em;
+        font: 400 18px Roboto, Arial, sans-serif;
+        overflow: hidden;
+        font-family: Roboto;
+        padding: 0;
+      }
+      
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+      
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+      
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+      
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+      }
+      
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+      
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }

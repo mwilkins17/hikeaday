@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+<html>
+  <head>
+    {% block head %}
+
+    {% endblock %} 
+  </head>
+  <body>
+      {% block body %} 
+      <form action="/trails" class="search--form" method="POST">
+        <input name="trail_search" class="search--input" type="search" placeholder="Search here...">
+      </form>
+      {% endblock %}
+  </body>
+</html>

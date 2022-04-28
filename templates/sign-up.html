@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block body %}
+
+  {% for msg in get_flashed_messages() %}
+        <p class="flash-msg">
+          {{ msg }}
+        </p>
+      {% endfor %}
+
+            <h2 >Create an account</h2><br>
+
+            <form action="/sign-up" method="POST">
+
+              <div>
+                <label for="fname">First Name</label>
+                <input type="text" name="fname" id="fname" placeholder="First Name"/>
+                
+              </div>
+
+              <div>
+                <label for="lname">Last Name</label>
+                <input type="text" name="lname" id="lname" placeholder="Last Name"/>
+              </div>
+
+              <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="Email"/>
+              </div>
+
+              <div>
+                <label for="username">Username</label>
+                <input type="username" name="username" id="username" placeholder="Username"/>
+              </div>
+
+              <div>
+                <label class="form-label" for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Password" />
+              </div>
+
+              <div>
+                <label class="form-label" for="password-repeat">Re-enter your password</label>
+                <input type="password" name="password-repeat" id="password-repeat" placeholder="Re-Enter Password" />
+              </div>
+
+              <div>
+                <button type="submit">Register</button>
+              </div>
+
+            </form>
+
+              <p>Have already an account? <a href="/login"><u>Login here</u></a></p>
+
+
+{% endblock %}
