@@ -1,1 +1,26 @@
 {% extends "base.html" %}
+
+{% block body %}
+
+<form action="/trails" class="search--form" method="POST">
+    <input name="trail_search" class="search--input" type="search" placeholder="Search here...">
+</form>
+
+<ul style="font-size: 1.5em; margin-top: 30px; background-color: white; width: 50%; margin-right:auto; margin-left:auto;" class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+      <button style="margin: 15px;" id="profile--info" class="btn btn-outline-primary" role="button">Info</button>
+    </li>
+    <li class="nav-item">
+      <button style="margin: 15px;" id="user--reviews" class="btn btn-outline-primary">Reviews</button>
+    </li>
+    <li class="nav-item">
+      <button style="margin: 15px;" id="user--favorites" class="btn btn-outline-primary">Favorites</button>
+    </li>
+  </ul>
+
+
+  <div id="profile-info" class="container" style="margin-top: 20px; max-width: 50%; max-height: 500px;"></div>
+  <div id="user-favorites"></div>
+  
+  <script src="../static/js/get_profile_info.js"></script>
+{% endblock %}

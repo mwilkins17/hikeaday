@@ -3,6 +3,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import json
+from datetime import datetime
+
+from sqlalchemy import null
 
 db = SQLAlchemy()
 
@@ -21,9 +24,11 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     phone = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.now(tz=None))
 
     favorites = db.relationship('Favorite', back_populates='users')
     reviews = db.relationship('Review', back_populates='users')
+    images = db.relationship('Images', back_populates='users')
     
     #many-to-one relationship  favorites table
     
@@ -40,7 +45,7 @@ class User(db.Model):
         Phone = {self.phone}
         >
         """
-    
+
      
 class Review(db.Model):
     """Model foe Review class"""
@@ -52,6 +57,7 @@ class Review(db.Model):
     trail_id = db.Column(db.Integer, db.ForeignKey("trails.trail_id"), nullable=False)
     num_stars = db.Column(db.Integer)
     review_text = db.Column(db.String)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
     
     users = db.relationship("User", back_populates="reviews")
     trails = db.relationship("Trail", back_populates="reviews")
@@ -88,6 +94,7 @@ class Trail(db.Model):
 
     favorites = db.relationship("Favorite", back_populates="trails")
     reviews = db.relationship("Review", back_populates="trails")
+    images = db.relationship("Images", back_populates="trails")
 
     
     def __repr__(self):
@@ -119,7 +126,8 @@ class Favorite(db.Model):
     
     favorite_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'), nullable=False)
+    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
     
     users = db.relationship("User", back_populates="favorites")
     trails = db.relationship("Trail", back_populates="favorites")
@@ -133,7 +141,22 @@ class Favorite(db.Model):
             <Favorite ID: {self.favorite_id}
             User ID: {self.user_id}
             Trail ID: {self.trail_id}>
-            """      
+            """ 
+            
+
+class Images(db.Model):
+    """Model for TrailImages class"""
+    
+    __tablename__ = "images"
+    
+    image_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    image_url = db.Column(db.String, nullable=False)
+    trail_id = db.Column(db.Integer, db.ForeignKey("trails.trail_id"), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(tz=None))
+    
+    users = db.relationship("User", back_populates="images")
+    trails = db.relationship("Trail", back_populates="images")
     
     
 def connect_to_db(flask_app, db_uri="postgresql:///hikeaday", echo=True):
