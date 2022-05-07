@@ -4,6 +4,7 @@ import re, datetime, json, requests, csv, os, model
 from model import db, User, Favorite, Trail, Review, Images, connect_to_db
 from flask import session
 from datetime import datetime
+from secrets import IMAGE_API_KEY
 
 # Functions start here!
 
@@ -247,7 +248,7 @@ def populate_trail_images(trail_id):
 
     headers = {
         "X-RapidAPI-Host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
-        "X-RapidAPI-Key": "b3e7a39b62mshf47ba523448c846p1cc65ajsn96fab1a929f5"
+        "X-RapidAPI-Key": IMAGE_API_KEY
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)

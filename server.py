@@ -4,6 +4,7 @@ from random import choice
 import http.client, json, requests, datetime, crud
 from model import connect_to_db, db, Trail, User, Favorite, Review
 from datetime import datetime
+from secrets import WEATHER_API_KEY
 
 
 app = Flask(__name__)
@@ -231,7 +232,7 @@ def get_weather():
 
     headers = {
         "X-RapidAPI-Host": "community-open-weather-map.p.rapidapi.com",
-        "X-RapidAPI-Key": "b3e7a39b62mshf47ba523448c846p1cc65ajsn96fab1a929f5",
+        "X-RapidAPI-Key": WEATHER_API_KEY,
         "units": "imperial",
         "content-type": "text/plain; charset=utf-8",
     }
