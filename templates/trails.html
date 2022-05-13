@@ -1,52 +1,50 @@
 {% extends "base.html" %}
 
 {% block head %}
-
+<style>
+  #map, .map {
+    height: 75%;
+    width: 50%;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
 {% endblock %}
 
 {% block body %}
-    Button trigger modal
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
+<div id="state--search" ></div>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Good stuff
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+<form id="state--searching--form" action="/trail/state/state" method="POST" class="search--form">
+  <input id="searching" name="state" class="search--input" type="search" placeholder="Search here...">
+</form>
+
+<script src="../static//js/listenForTrailsLoad.js" ></script>
+<script type="text/javascript" src="../static/js/searchForTrails.js"></script>
+
+
+<div id="state--trails" >
+  
+  <h1 id="state--name" style="background-color: white; border-radius:15px;margin-left: auto; margin-right: auto; width:50%; margin-top: 15px; text-align: center;">{{session['state_name']}} National Park Trails</h1>
+  <div style="align-items: center;">
+    <div id="state--search--div">
+    <div id="state--trails--div" class="btn-group-vertical" style="padding: 15px; margin-left:auto; margin-right:auto; text-align:left; display:block; height: 400px; width: 50%;background-color:white; overflow:scroll; margin-top:15px; color:white" id="trail-click" >
       </div>
     </div>
   </div>
 </div>
 
 
-<form action="/trails" class="search--form" method="POST">
-  <input name="trail_search" class="search--input" type="search" placeholder="Search here...">
-</form>
-<!-- <div style="text-align:center" >
-  <input type="button" value="Sort by City"></input>
-</div> -->
-{% if results %}
-
-<h1 style="background-color: white; border-radius:15px;margin-left: auto; margin-right: auto; width:50%; margin-top: 15px; text-align: center;">{{session['search']}} National Park Trails</h1>
-<div style="align-items: center;">
-  <div class="btn-group-vertical" style="padding: 15px; margin-left:auto; margin-right:auto; text-align:left; display:block; height: 400px; width: 50%;background-color:white; overflow:scroll; margin-top:15px; color:white" id="trail-click" >
-      {% for result in results %}
-        <button class="btn btn-link" style="text-align:center" href="/trails/{{result.name}}"><a href="/trails/{{result.name}}">{{result.name}}<br>City/Area: {{result.city_name}}</a></button>
-      {% endfor %}
-  </div>
-</div>
-{% endif %}
+  <div style="display:none;" id="state-lat">{{session['state-lat']}}</div>
+  <div style="display:none;" id="state-lng">{{session['state-lng']}}</div>
   
-<div id="map"></div>
+
+
+  <div style="max-width: 75%; padding: 0; margin:o" id="map"></div>
+  <script src="../static/js/maps.js"></script>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
+
+</div>
 {% endblock %}

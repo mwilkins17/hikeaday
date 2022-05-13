@@ -1,21 +1,102 @@
 from crypt import methods
 from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
 from random import choice 
-import http.client, json, requests, datetime, crud
-from model import connect_to_db, db, Trail, User, Favorite, Review
+import http.client, json, requests, datetime, crud, os
+from model import connect_to_db, db, Trail, User, Favorite, Review, Images
 from datetime import datetime
-from secrets import WEATHER_API_KEY
+from geopy.geocoders import Nominatim
+from functools import partial
+
+WEATHER_API_KEY = os.environ['WEATHER_API_KEY']
+FLASK_APP_SECRET_KEY = os.environ['FLASK_APP_SECRET_KEY']
+GOOGLE_MAPS_API_KEY = os.environ['GOOGLE_MAPS_API_KEY']
+
 
 
 app = Flask(__name__)
-app.secret_key = 'SECRETSECRETSECRET'
+app.secret_key = FLASK_APP_SECRET_KEY
 
 
+STATES_ABBREV = set(["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA", 
+          "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", 
+          "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", 
+          "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
+          "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", 
+          'al', 'ak', 'az', 'ar', 'ca', 'co', 'ct', 'dc', 'de', 'fl',
+          'ga', 'hi', 'id', 'il', 'in', 'ia', 'ks', 'ky', 'la', 'me',
+          'md', 'ma', 'mi', 'mn', 'ms', 'mo', 'mt', 'ne', 'nv', 'nh',
+          'nj', 'nm', 'ny', 'nc', 'nd', 'oh', 'ok', 'or', 'pa', 'ri',
+          'sc', 'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv', 'wi', 'wy'])
+
+US_STATES_TO_ABBREV = {
+    "Alabama": "AL",
+    "Alaska": "AK",
+    "Arizona": "AZ",
+    "Arkansas": "AR",
+    "California": "CA",
+    "Colorado": "CO",
+    "Connecticut": "CT",
+    "Delaware": "DE",
+    "Florida": "FL",
+    "Georgia": "GA",
+    "Hawaii": "HI",
+    "Idaho": "ID",
+    "Illinois": "IL",
+    "Indiana": "IN",
+    "Iowa": "IA",
+    "Kansas": "KS",
+    "Kentucky": "KY",
+    "Louisiana": "LA",
+    "Maine": "ME",
+    "Maryland": "MD",
+    "Massachusetts": "MA",
+    "Michigan": "MI",
+    "Minnesota": "MN",
+    "Mississippi": "MS",
+    "Missouri": "MO",
+    "Montana": "MT",
+    "Nebraska": "NE",
+    "Nevada": "NV",
+    "New Hampshire": "NH",
+    "New Jersey": "NJ",
+    "New Mexico": "NM",
+    "New York": "NY",
+    "North Carolina": "NC",
+    "North Dakota": "ND",
+    "Ohio": "OH",
+    "Oklahoma": "OK",
+    "Oregon": "OR",
+    "Pennsylvania": "PA",
+    "Rhode Island": "RI",
+    "South Carolina": "SC",
+    "South Dakota": "SD",
+    "Tennessee": "TN",
+    "Texas": "TX",
+    "Utah": "UT",
+    "Vermont": "VT",
+    "Virginia": "VA",
+    "Washington": "WA",
+    "West Virginia": "WV",
+    "Wisconsin": "WI",
+    "Wyoming": "WY",
+    "District of Columbia": "DC",
+    "American Samoa": "AS",
+    "Guam": "GU",
+    "Northern Mariana Islands": "MP",
+    "Puerto Rico": "PR",
+    "United States Minor Outlying Islands": "UM",
+    "U.S. Virgin Islands": "VI",
+}
+
+INVERTED_US_STATES_TO_ABBREV = dict(map(reversed, US_STATES_TO_ABBREV.items()))
+print(INVERTED_US_STATES_TO_ABBREV)
 ###############################################################################
 #                                                                             #
 #                             NAVIGATION ROUTES                               #
 #                                                                             #
 ###############################################################################
+
+
 
 @app.route("/")
 def index():
@@ -43,7 +124,7 @@ def about():
 @app.route("/trails", methods=["GET"])
 def trails():
     """######## Render the trails.html route ########"""
-    
+
     return render_template('trails.html')
 
 
@@ -54,43 +135,111 @@ def trails():
 #   ----------------------------------------------------------------
 
 
-@app.route("/trails", methods=["POST"])
+@app.route("/trail/state/state", methods=["POST"])
 def trail_search():    
     """######## Search for a trail ########"""
-    
+
+    state = request.form.get('state')
+
+    if len(state) == 2:
+        state = state.upper()
         
-    search = request.form.get('trail_search').title()
-    session['search'] = search
-    results = crud.search_trails(search)
+    if len(state) > 2:
+        state = state.title()
 
-    return render_template('trails.html', results = results)
+    if state in STATES_ABBREV:
+        state = INVERTED_US_STATES_TO_ABBREV[state]
 
-
-@app.route("/api/trails")
-def get_trail_data():
-    state = session['search']
-    trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == state).all()
-
+    if state not in INVERTED_US_STATES_TO_ABBREV.keys() and state not in US_STATES_TO_ABBREV.keys() and state not in STATES_ABBREV:
+        flash(f"{state} is not a state. Please check your spelling.")
+        return redirect("/")
     
+    session['state_name'] = state
+    crud.add_state_coords_to_session()
+
+    return redirect('/trails')
+
+
+
+@app.route("/trails/all-state", methods=["POST", "GET"])
+def get_trail_data():
+    trails_data = []
+    list_of_trail_dicts = []
+
+    trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == session['state_name']).all()
+
     for trail in trail_data_in_a_state:
         coords = eval(trail._geoloc)
         lat = coords['lat']
         lng = coords['lng']
-        
-        
-        trails = [
-        {
-            "trail_name": trail.name,
-            "city_name" : trail.city_name,
+        image_url = db.session.query(Images.image_url).filter(Images.trail_id == trail.trail_id).first()
+        trail_info =[{
+            "name": trail.name,
+            "city" : trail.city_name,
+            "area_name" : trail.area_name,
             'lat' : lat,
             'lng' : lng,
-            'elevation_gain' : trail.elevation_gain,
+            'elevation_gain' : int(trail.elevation_gain),
             'difficulty_rating' : trail.difficulty_rating,
             'route_type' : trail.route_type,
+            "image_url" : image_url[0],
         }]
-        
+        trails_data.extend(trail_info)
 
-    return jsonify(trails)
+    return jsonify(trails_data)
+
+@app.route("/trails/map-state")
+def get_map_data():
+    trails_data = []
+    list_of_trail_dicts = []
+    
+    trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == session['state_name']).all()
+
+    for trail in trail_data_in_a_state:
+        coords = eval(trail._geoloc)
+        lat = coords['lat']
+        lng = coords['lng']
+        image_url = db.session.query(Images.image_url).filter(Images.trail_id == trail.trail_id).first()
+        trail_info =[{
+            "name": trail.name,
+            "city" : trail.city_name,
+            "area_name" : trail.area_name,
+            'lat' : lat,
+            'lng' : lng,
+            'elevation_gain' : int(trail.elevation_gain),
+            'difficulty_rating' : trail.difficulty_rating,
+            'route_type' : trail.route_type,
+            # "image_url" : image_url[0],
+        }]
+        trails_data.extend(trail_info)
+
+    return jsonify(trails_data)
+
+
+@app.route("/trails/all-trails")
+def get_state_coords():
+        trails_data = []
+
+        all_trails = db.session.query(Trail).all()
+        for trail in all_trails:
+            coords = eval(trail._geoloc)
+            lat = coords['lat']
+            lng = coords['lng']
+            trail_info = {
+                "name": trail.name,
+                "city" : trail.city_name,
+                "area_name" : trail.area_name,
+                'lat' : lat,
+                'lng' : lng,
+                'elevation_gain' : int(trail.elevation_gain),
+                'difficulty_rating' : trail.difficulty_rating,
+                'route_type' : trail.route_type,
+            }
+            trails_data.append(trail_info)
+
+        return jsonify(trails_data)
+    
+
 
 #   ----------------------------------------------------------------
 
@@ -103,13 +252,14 @@ def get_trail_data():
 @app.route("/trails/<trail_name>")
 def trail_details(trail_name):
     """######## Get the details page of a trail ########"""
+
     trail = db.session.query(Trail).filter(Trail.name == trail_name).first()
     trail_id = trail.trail_id
     session['trail_id'] = trail.trail_id
 
     session['trail_name'] = trail_name
-    features = crud.get_features()
-    activities = crud.get_activities()
+    features = crud.get_features(trail_id)
+    activities = crud.get_activities(trail_id)
     
     
     reviews = crud.get_all_reviews_by_current_trail(trail_id)
@@ -119,56 +269,58 @@ def trail_details(trail_name):
     lat = coords['lat']
     lng = coords['lng']
 
-    active_image = trail_images[2]
+    active_image = trail_images[1]
     if session.get('user_id'):
         reviewed = crud.did_user_review(session['user_id'], trail_id)
         review_text = crud.get_user_review_for_current_trail(session['user_id'], trail_id)
         return render_template("/trail_details.html",
-                               active_image = active_image,
-                               reviewed=reviewed,
-                               review_text=review_text,
-                               reviews=reviews,
-                               trail=trail,
-                               features=features,
-                               activities=activities,
-                               trail_images = trail_images,
-                               lat=lat,
-                               lng=lng)
+                            active_image = active_image,
+                            reviewed=reviewed,
+                            review_text=review_text,
+                            reviews=reviews,
+                            trail=trail,
+                            features=features,
+                            activities=activities,
+                            trail_images = trail_images,
+                            lat=lat,
+                            lng=lng)
     
     else:
         reviewed=False
         return render_template("/trail_details.html",
-                               active_image=active_image,
-                               reviewed=reviewed,
-                               trail=trail,
-                               reviews=reviews,
-                               features=features,
-                               activities=activities,
-                               trail_images = trail_images,
-                               lat=lat,
-                               lng=lng)
+                            active_image=active_image,
+                            reviewed=reviewed,
+                            trail=trail,
+                            reviews=reviews,
+                            features=features,
+                            activities=activities,
+                            trail_images = trail_images,
+                            lat=lat,
+                            lng=lng)
+
 
 
 @app.route("/trails/<trail_name>", methods=["POST"])
 def submit_review(trail_name):
     """Get trail details. Page renders dynamically depending on whether
                 or not a user is in the session"""
-    
-    features = crud.get_features()
-    activities = crud.get_activities()
-    
-    trail_name = session['trail_name']
-    trail = Trail.query.filter(Trail.name == trail_name).first()
+                
+    trail = Trail.query.filter(Trail.trail_id == session['trail_id']).first()
     
     trail_id = trail.trail_id
     session['trail_id'] = trail_id
     
+    trail_name = session['trail_name']
+    
+    
+    features = crud.get_features(trail_id)
+    activities = crud.get_activities(trail_id)
     
     user_id = session['user_id']
     
     review = request.form.get("new-review")
-    reviews = crud.get_all_reviews_by_current_trail(trail_id)
 
+    reviews= crud.get_all_reviews_by_current_trail(session['trail_id'])
     user_review = crud.did_user_review(user_id, trail_id)
     
     session['total_reviews'] = len(crud.get_all_current_user_reviews(user_id))
@@ -219,7 +371,63 @@ def submit_review(trail_name):
                                reviews=reviews,
                                features=features,
                                activities=activities)   
-         
+
+
+@app.route("/api/edit-review", methods=["POST"])
+def edit_review():
+    review = request.json.get("review")
+    crud.edit_review(review, session['user_id'], session['trail_id'])
+    # all_reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
+    res = {'success' : True,
+        'status' : 'Your review has been edited.',
+        'review' : review}
+    return res
+
+@app.route("/api/delete-review")
+def delete_review():
+    reviewid = crud.get_user_review_id_for_current_trail(session['user_id'], session['trail_Id'])
+    Review.query.filter(Review.review_id == reviewid).delete()
+    session.modified = True
+    db.session.commit()
+    res = {'success' : True}
+    return jsonify(res)
+
+@app.route('/trails/reviews')
+def get_reviews_for_current_trail():
+    reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
+    print(type(reviews))
+    return jsonify(reviews)
+
+
+
+@app.route('/get-trail-details')
+def get_trail_details():
+    trail = db.session.query(Trail).filter(Trail.trail_id == session['trail_id']).first()
+    features = crud.get_features(session['trail_id'])
+    activities = crud.get_activities(session['trail_id'])
+    image_url = db.session.query(Images.image_url).filter(Images.trail_id == session['trail_id']).first()
+    
+    coords = eval(trail._geoloc)
+    lat = coords['lat']
+    lng = coords['lng']
+    
+    trail_info = [
+    {
+        "name": trail.name,
+        "city" : trail.city_name,
+        "area_name" : trail.area_name,
+        'lat' : lat,
+        'lng' : lng,
+        'elevation_gain' : int(trail.elevation_gain),
+        'difficulty_rating' : trail.difficulty_rating,
+        'route_type' : trail.route_type,
+        "image_url" : image_url[0],
+        'features' : features,
+        'activities' : activities,
+    }]
+    
+    return jsonify(trail_info)
+
 
 @app.route("/trail/weather")
 def get_weather():
@@ -242,7 +450,6 @@ def get_weather():
     weather_dict = response.json()
 
     return weather_dict
-
 
 
 ###############################################################################
@@ -281,7 +488,7 @@ def sign_up():
 
 @app.route('/sign-up', methods=["POST"])
 def register_user():  
-        """######## Register a user and commit their info into the db ########"""
+        """Register a user and commit their info into the db"""
 
         fname = request.form.get("fname")
         lname = request.form.get("lname")
@@ -317,14 +524,14 @@ def register_user():
     
 @app.route("/login")
 def login():
-    """######## Render the login.html template ########"""
+    """Render the login.html template"""
     
     return render_template('login.html')
 
 
 @app.route("/login", methods=['POST'])
 def user_log_in():
-    """######## Log a user in ########"""    
+    """ Log a user in"""    
     
     username = request.form.get("username")
     password = request.form.get("password")
@@ -379,21 +586,17 @@ def get_profile_info():
     user = crud.get_user_by_username(session['username'])
     
     user_reviews = crud.get_all_current_user_reviews(session['user_id'])
-    # user_favorites = crud.get_all_favorites_by_user(session['user_id'])
+
     favorite_trails = crud.get_all_trail_names_for_favorited_trails(session['user_id'])
     
-    reviews_list = []
-    review_values = user_reviews.values()
-    print(user_reviews)
-    for review in review_values:
-        reviews_list.append(review[1])
+
     username = user.username
     email = user.email
     first_name = user.fname
     last_name = user.lname
-    
+
     user_info = {
-        "user_reviews" : reviews_list,
+        "user_reviews" : user_reviews,
         "user_favorites" : favorite_trails,
         "username" : username,
         "email" : email,
@@ -402,8 +605,6 @@ def get_profile_info():
     }
     
     return user_info
-
-    
 
 
 if __name__ == '__main__':

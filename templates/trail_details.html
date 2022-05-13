@@ -1,12 +1,31 @@
 {% extends "base.html" %}
 
 {% block head %}
-<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+<style>
+    #map, .map {
+      height: 100%;
+      width: 100%;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
+
+
+ 
+<form id="state--searching--form" action="/trail/state/state" method="POST" class="search--form">
+    <input id="searching" name="state" class="search--input" type="search" placeholder="Search here...">
+</form>
+  
+  <script src="../static//js/listenForTrailsLoad.js" ></script>
+  <script type="text/javascript" src="../static/js/searchForTrails.js"></script>
+  
+
 
 <div>
     <div class="col-12 col-md-auto text-center mx-auto">
@@ -31,27 +50,43 @@
     </div>
 
 <!-- TRAIL IMAGES CAROUSEL -->
-
-<div style="background-color: rgb(128, 128, 128, 0.9);" id="carouselExampleControlsNoTouching" class="carousel slide" data-bs-touch="false" data-bs-interval="false" >
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img style="height: 500px; margin:auto;" src="{{active_image[0]}}" class="d-block w-5" alt="">
-        </div>
-        {% for image in trail_images %}
-            <div class="carousel-item">
-                <img style="height: 500px; margin:auto;" src="{{image[0]}}" class="d-block w-5" alt="">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div style="background-color: rgb(128, 128, 128, 0.9);" id="carouselExampleControlsNoTouching" class="carousel slide" data-bs-touch="false" data-bs-interval="false" >
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img style="height: 500px; margin:auto;" src="{{active_image[0]}}" class="d-block w-5" alt="">
+                    </div>
+                    {% for image in trail_images %}
+                        <div class="carousel-item">
+                            <img style="height: 500px; margin:auto;" src="{{image[0]}}" class="d-block w-5" alt="">
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+                </button>
             </div>
-        {% endfor %}
+        </div>
+        <div class="col">
+            <div style="max-width: 100%; padding: 0; margin:0" id="map"></div>
+        </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
+</div>
+
+  
+  
+  <script src="../static/js/trailDetailsMap.js"></script>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
+  
+  <div id="lat" style="display:none;" >{{lat}}</div>
+  <div id="lng" style="display:none;" >{{lng}}</div>
 
   <!-- FAVORITING BUTTON -->
   <div style="width: 25px; cursor: pointer" id="favorite"></div>
@@ -139,14 +174,19 @@
 <script type="text/babel" src="/static/js/Index.jsx"></script>
 
 
+<!-- #################################################################################
+
+                            # Reviews Section
+
+################################################################################# -->
+
 
 <div class="container" style="background-color: #D9AE94; margin-top: 30px;">
+
     {% if reviews %}
-    <div style="text-align:center; padding-bottom: 50px;">
-        {% for review in reviews %}
-                <h3 style="border-style:solid; border-color:black; color:black; text-align: center; background-color: white; border-radius: 15px;">{{review}}</h3>
-            {% endfor %}
-        </div>
+    <div id="trail--reviews" style="text-align:center; padding-bottom: 50px;"><div></div>
+    </div>
+    <script src="../static/js/getReviewsForTrail.js"></script>
     {% else %}
         {% if session['user_id'] %}
             <div style="text-align:center; padding-bottom: 50px;">
@@ -162,11 +202,95 @@
     {% endif %}
 
     {% if reviewed %}
-    <form style="text-align:center;" method="POST" action="/trails/{{trail.name}}">
-        <textarea style="height: 100px; width: 50%; text-align: center" name="edit-review" type="text">{{review_text}}</textarea><br>
-        <input style="width:50%" type="Submit" value="Edit Review" />
-    </form>
 
+
+
+    <!-- #################################################################################
+
+                            # Edit Review Modal
+
+    ################################################################################# -->
+
+    <div class="row text-center">
+        <div class="col">
+            <button style="margin:15px" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteReviewModal">
+                Delete Review
+            </button>
+        </div>
+        <div class="col">
+            <button style="margin:15px" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editReviewModal">
+                Edit Review  
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteReviewModal" tabindex="-1" role="dialog" aria-labelledby="deleteReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteReviewModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                        <div style="text-align:center; width:450px; margin-right: auto; margin-left: auto;">
+                        <h3>Are you sure you want to delete your review?</h3>
+                        </div><br>
+                        <div style="padding: 15px" class="row justify-content-between">
+                            <div class="row">
+                                <div style="text-align: right" class="col">
+                                    <form id="delete--review"  method="POST"  action="/trails/delete-post">
+                                        <button id="review-submit-reviewed" name="delete-review" class="btn btn-primary" type="submit" Value="Delete Review">Confirm</button>
+                                    </form>
+                                </div>
+                                <div class="col">
+                                    <button id="cancel--delete" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editReviewModalLabel">Edit Your Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <form id="review--form">
+                            <div style="text-align:center; width:450px; margin-right: auto; margin-left: auto;">
+                                <textarea id="edited--review" 
+                                style="text-align: center; width: 450px; height: 300px" name="edit-review" type="text">{{review_text}}</textarea>
+                            </div><br>
+                            <div style="padding: 15px" class="row justify-content-between">
+                                <div class="col-lg-auto">
+                                </div>
+                                <div class="col-md-auto">
+                                    <button id="edit--review" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+                                    <button id="cancel--edit" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+                
+                
+                
+                
+<script async src="../static/js/editReview.js"></script>
+<script async src="../static/js/listenForEditReview.js"></script>
+<!-- <script src="../static/js/deleteReview.js"></script> -->
+    <script src="../static/js/editReview.js"></script>
+    
     <form style="text-align:center;padding-bottom: 50px;" method="POST" action="/trails/delete-post">
         <input style="width:50%" id="review-submit-reviewed" name="delete-review" type="Submit" Value="Delete Review" />
     </form>
@@ -178,7 +302,7 @@
         <textarea style="height: 100px; width: 50%; text-align: center;" name="new-review" 
         type="text" placeholder="Please type your review here..."></textarea><br>
 
-        <input style="width:50%" type="Submit" value="Submit Review" />
+        <input class="btn btn-primary" tyle="width:50%" type="Submit" value="Submit Review" />
     </form>
 
     {% else %}

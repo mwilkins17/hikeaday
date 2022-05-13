@@ -1,16 +1,28 @@
 {% extends 'base.html' %}
 
-<html>
-  <head>
     {% block head %}
-
+    <style>
+      #map, .map {
+        height: 75%;
+        width: 75%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
     {% endblock %} 
-  </head>
-  <body>
+
       {% block body %} 
-      <form action="/trails" class="search--form" method="POST">
-        <input name="trail_search" class="search--input" type="search" placeholder="Search here...">
+      <form id="searching--form" action="/trail/state/state" method="POST" class="search--form">
+        <input id="searching" name="state" class="search--input" type="search" placeholder="Search here...">
       </form>
+
+      <script src="../static/js/listenForStateSearch.js" ></script>
+            
+        <div style="max-width: 100%; padding: 0; margin-left:auto; margin-right: auto; margin-top: 25px" id="map"></div>
+        <script type="text/javascript" src="../static/js/getMapAll.js"></script>
+        <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
+
       {% endblock %}
-  </body>
-</html>

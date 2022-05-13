@@ -4,9 +4,10 @@ import re, datetime, json, requests, csv, os, model
 from model import db, User, Favorite, Trail, Review, Images, connect_to_db
 from flask import session
 from datetime import datetime
-from secrets import IMAGE_API_KEY
+from geopy.geocoders import Nominatim
+from functools import partial
 
-# Functions start here!
+IMAGE_API_KEY = os.environ['IMAGE_API_KEY']
 
 #################################################################################
 #                                                                               #
@@ -85,7 +86,7 @@ def is_current_trail_favorited(user_id, trail_id):
                                                  ).filter(
                                                      Favorite.user_id == user_id, Favorite.trail_id == trail_id).all()
     # db.session.query(Favorite).filter((Favorite.user_id == user_id) & (Favorite.trail_id == trail_id)).all()
-    print(is_Favorited)
+
     if is_Favorited:
         return True
     else:
@@ -107,9 +108,7 @@ def update_favorite(user_id, trail_id):
     """Update the database if a trail is or is not favorited"""
     is_favorite = is_current_trail_favorited(user_id, trail_id)
     favorite_id = get_user_favorite_id_for_current_trail(user_id, trail_id)
-    print(f'@@@@@@@@@@@@@@@@@{is_favorite}@@@@@@@@@@@@@@@@@@@')
     if is_favorite:
-        # Favorite.query.filter(Favorite.favorite_id == favorite_id).delete()
         favorite = db.session.get(Favorite, favorite_id)
         db.session.delete(favorite)
         session.modified = True
@@ -124,6 +123,25 @@ def update_favorite(user_id, trail_id):
         db.session.add(favorite)
         db.session.commit()
         return True
+
+#################################################################################
+
+                    # Coordinates/Geolocating Functions
+
+#################################################################################
+
+def add_state_coords_to_session():
+    """Get the coords for a state and add the longitude and latitude to the session"""
+    geolocator = Nominatim(user_agent="hikeaday")
+    geocode = partial(geolocator.geocode, exactly_one=True)
+    location = geolocator.geocode(f"{session['state_name']}, United States")
+    session['state-lat'] = float(location.latitude)
+    session['state-lng'] = float(location.longitude)
+
+
+
+
+
 
 #################################################################################
 
@@ -213,6 +231,10 @@ def add_trail_image(trail_id, image_url):
     db.session.add(new_image)
     db.session.commit()
 
+def add_all_trail_images():
+    all_trail_ids = db.session.query(Trail.trail_id).all()
+    for trail_id in all_trail_ids:
+        check_if_trail_images_are_populated(trail_id[0])
 
 def add_user_image(user_id, image_url):
     """Add a user image"""
@@ -236,29 +258,37 @@ def add_user_trail_image(user_id, image_url, trail_id):
 ################## Image crud Functions ##################
 
 def populate_trail_images(trail_id):
-    """Populates the database with trail images from Google images via the USearch API. 
+    """Populates the database with trail images from Bing images. 
                                 See API documentaion here:
-        https://rapidapi.com/contextualwebsearch/api/web-search?endpoint=apiendpoint_2799d2c8-3abb-4518-a544-48d2c32d6662 """
-    
-    url = "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI"
+        https://rapidapi.com/microsoft-azure-org-microsoft-cognitive-services/api/bing-image-search1 """
+
     trail_name = str(db.session.query(Trail.name).filter(Trail.trail_id == trail_id).first())
-    area_name = str(db.session.query(Trail.area_name).filter(Trail.name == session['trail_name']).first())
-    state_name = str(db.session.query(Trail.state_name).filter(Trail.name == session['trail_name']).first())
-    querystring = {"q":f"{trail_name}","pageNumber":"1","pageSize":"1","autoCorrect":"true"}
+    area_name = str(db.session.query(Trail.area_name).filter(Trail.trail_id == trail_id).first())
+    geolocation = str(db.session.query(Trail._geoloc).filter(Trail.trail_id == trail_id).first())
+    state_name = str(db.session.query(Trail.state_name).filter(Trail.trail_id == trail_id).first())
+
+    query = f'{trail_name} trail in {state_name}'
+
+    url = "https://bing-image-search1.p.rapidapi.com/images/search"
+
+    querystring = {"q":query,"count":"10","offset":"0","mkt":"en-US"}
 
     headers = {
-        "X-RapidAPI-Host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
+        "X-RapidAPI-Host": "bing-image-search1.p.rapidapi.com",
         "X-RapidAPI-Key": IMAGE_API_KEY
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
+
+    
     if response:
         image_dict = response.json()
-        print(image_dict)
         list_of_dicts = image_dict['value']
         list_of_image_urls = []
         for dict in list_of_dicts:
-            list_of_image_urls.append(dict.get('url'))
+            
+            list_of_image_urls.append(dict.get('contentUrl'))
+
         for url in list_of_image_urls:
             add_trail_image(trail_id, url)
     
@@ -269,12 +299,13 @@ def check_if_trail_images_are_populated(trail_id):
     image_check = db.session.query(Images).filter(Images.trail_id == trail_id).all()
     if not image_check:
         populate_trail_images(trail_id)
+
         
 def get_all_trail_images_for_current_trail(trail_id):
     check_if_trail_images_are_populated(trail_id)
     images_list = db.session.query(Images.image_url).filter(Images.trail_id == trail_id).all()
     return(images_list)
-    # trail_names_list.append(trail_name._asdict())
+
     
     
     
@@ -302,40 +333,63 @@ def did_user_review(user_id, trail_id):
     """See if a user reviewed the current trail in the Flask session"""
     
     user_reviews_dict = get_all_current_user_reviews(user_id)
-    if user_id:
-        print(True if trail_id in user_reviews_dict.keys() else False)
-    if trail_id in user_reviews_dict.keys():
+    all_trail_ids = set()
+    for review in user_reviews_dict:
+        all_trail_ids.add(review['trail_id'])
+    if trail_id in all_trail_ids:
         return True
     else:
         return False
     
 def get_all_current_user_reviews(user_id):
     """Get all the reviews for the user in the Flask session"""
-    
-    user = User.query.filter(User.user_id == user_id).first()
+
     current_user_review_ids = db.session.query(
         Review.trail_id, 
         Review.review_id, 
-        Review.review_text).filter(
+        Review.review_text,
+        Review.created_at,
+        Review.user_id).filter(
             Review.user_id == user_id).all()
-        
-    reviews_dict = {}
+    
+    reviews_list = []
     for review in current_user_review_ids:
-        reviewid = review[0]
-        trailid = review[1]
-        reviewtext = review[2]
-        reviews_dict[reviewid]=(trailid, reviewtext)
-    return reviews_dict
+        created_date = str(review[3])[:11]
+        trail = db.session.query(Trail).filter(Trail.trail_id == review[0]).first()
+
+        review_dict = {
+            'review_id' : review[1],
+            'trail_id' : review[0],
+            'text' : review[2],
+            'created_date' : created_date,
+            'user_id' : review[4],
+            'trail_name' : trail.name,
+            'trail_city' : trail.city_name,
+            'trail_state' : trail.state_name
+                }
+        reviews_list.append(review_dict)
+    return reviews_list
 
 def get_all_reviews_by_current_trail(trail_id):
     trail_reviews = db.session.query(Review.user_id, 
-                                    Review.review_text).filter(
+                                    Review.review_text,
+                                    Review.created_at,
+                                    Review.review_id).filter(
                                     Review.trail_id == trail_id).all()
-                                    
+                                 
     list_of_trail_reviews = []
-    
     for review in trail_reviews:
-        list_of_trail_reviews.append(review[1])
+        username = db.session.query(User.username).filter(User.user_id == review[0]).first()
+        date = str(review[2])
+        review_dict = {
+            'user_id' : review[0],
+            'review_text' : review[1],
+            'created_at' : date[:10],
+            'review_id' : review[3],
+            'username' : username[0],
+        }
+        list_of_trail_reviews.append(review_dict)
+    print(list_of_trail_reviews)
     return list_of_trail_reviews
     
 def get_user_review_for_current_trail(user_id, trail_id):
@@ -378,29 +432,38 @@ def edit_review(edited_review, user_id, trail_id):
     db.session.commit()
 
 
-def get_features():
-    trails_list = []
+def get_features(trail_id):
+    features = db.session.query(Trail.features).filter(Trail.trail_id == trail_id).first()
 
-    filepath = 'national_park_data.csv'
-    input_file = csv.DictReader(open(filepath))
+    feature = features._asdict()
+    features_list = feature["features"].strip('}{').split(',')
+    if 'dogs' in features_list[0].lower():
+        dogs_allowed = features_list[0].split('-')
+        
+        if dogs_allowed[1].lower() == "yes":
+            formatted_dogs_allowed = "Dogs Allowed"
+            features_list[0] = formatted_dogs_allowed
+        else:
+            formatted_dogs_allowed = "No Dogs"
+            features_list[0] = formatted_dogs_allowed
+    
+    for i in range(len(features_list)):
+        if features_list[i] == 'Kids':
+            features_list[i]= 'Family-Friendly'
+        if features_list[i] == 'Views':
+            features_list[i]= 'Good Views'
 
-    for row in input_file:
-        trails_list.append(row)
-    for trail in trails_list:
-        features = trail.get('features').strip('][').strip("'").replace("'", "").title().split(', ')
-        return features
+    return features_list
 
-def get_activities():
-    trails_list = []
+def get_activities(trail_id):
+    activities = db.session.query(Trail.activities).filter(Trail.trail_id == trail_id).first()
 
-    filepath = 'national_park_data.csv'
-    input_file = csv.DictReader(open(filepath))
+    activity = activities._asdict()
+    activities_list = activity["activities"].strip('}{').split(',')
+    dogs_allowed = activities_list[0].split('-')
 
-    for row in input_file:
-        trails_list.append(row)
-    for trail in trails_list:
-        activities = trail.get('activities').strip('][').strip("'").replace("'", "").title().split(', ')
-        return activities
+    return activities_list
+ 
     
 
 #################################################################################

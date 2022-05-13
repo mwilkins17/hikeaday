@@ -67,7 +67,6 @@ h1 {
 .btn.btn-outline-primary {
   font-family: Manrope;
   font-size: 1em;
-  hover-color:pink;
 }
 
 .search-bar {
@@ -118,8 +117,6 @@ h1 {
 
 }
 
-
-
 h10 {
   display: block;
   font-size: 14px;
@@ -144,7 +141,6 @@ placeholder {
   color: black;
 }
 
-
 .sign-up.input {
   display: inline-block;
 }
@@ -168,4 +164,10 @@ placeholder {
   border-color:#B58463
 }
 
-      
+.window-content ul {
+  flex: 1 0;
+  list-style: none;
+  padding: 0;
+  margin: 1em 0 1em 1em;
+}
+

@@ -26,6 +26,8 @@ Flask==2.0.1
 Flask-DebugToolbar==0.11.0
 Flask-Modals==0.5.0
 Flask-SQLAlchemy==2.5.1
+geographiclib==1.52
+geopy==2.2.0
 greenlet==1.1.1
 html5lib==1.1
 httplib2==0.14.0

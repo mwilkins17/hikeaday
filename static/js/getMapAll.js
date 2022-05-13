@@ -1,15 +1,13 @@
 'use strict';
 
 function initMap() {
-    const stateLat = parseFloat(document.getElementById('state-lat').innerText);
-    const stateLng = parseFloat(document.getElementById('state-lng').innerText);
     const map = new google.maps.Map(document.getElementById('map'), {
       center: {
-        lat: stateLat,
-        lng: stateLng,
+        lat: 48.8097343,
+        lng: -96.5556199,
       },
       scrollwheel: true,
-      zoom: 6,
+      zoom: 3,
       zoomControl: true,
       panControl: false,
       streetViewControl: false,
@@ -20,10 +18,10 @@ function initMap() {
     
    
 
-    fetch('/trails/map-state')
+    fetch('/trails/all-trails')
       .then((response) => response.json())
-      .then((trails) => {
-        for (const trail of trails) {
+      .then((responseData) => {
+        for (const trail of responseData) {
           // Define the content of the infoWindow
           const trailInfoContent = `
           <a style="text-decoration: none; color: black;" href="trails/${trail.name}">
@@ -32,10 +30,6 @@ function initMap() {
             <div class="col-12"><h5>Trail Name: ${trail.name}</h5></div><br/>
                 <div class="col-3 text-left">
                     <div class="trail--thumbnail">
-                      <img style="width:90%"
-                        src="${trail.image_url}"
-                        alt=""
-                      />
                     </div>
                 </div>
                   
@@ -80,9 +74,10 @@ function initMap() {
         }
       })
     
-      .catch((error) => {
-        console.log(error)
-      ;
+      .catch(() => {
+        alert(`
+        Error
+      `);
     })
 
   }
