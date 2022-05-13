@@ -34,24 +34,24 @@ fetch('/trail/weather')
         }
         else {
         document.getElementById('forecast').insertAdjacentHTML("beforeend", `
-        <div id="forecast" class="col-2 text-center">
-                <div class="row">
-                </div>
-                <h7 style="font-size: 14px" >${dayName}, ${monthName} ${dayNum}, ${year}</h7>
+        <div id="forecast--card" class="col text-center">
+              <div class="row">
+              </div>
+              <h7 style="font-size: 14px" >${dayName}, ${monthName} ${dayNum}, ${year}</h7>
 
-                ${weather_icon}
-                <div class="row">
-                </div>
-                <div class="row">
-                        ${temp}
-                </div>
+              ${weather_icon}
+              <div class="row">
+              </div>
+              <div class="row">
+                      ${temp}
+              </div>
 
-                <div class="row">
-                    ${feels_like}
-                    ${temp_min}
-                    ${temp_max}
-                    ${weather_description}
-                </div>
+              <div class="row">
+                  ${feels_like}
+                  ${temp_min}
+                  ${temp_max}
+                  ${weather_description}
+              </div>
         </div>`);
         prevDate = date;
     }}

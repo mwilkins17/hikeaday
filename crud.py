@@ -2,12 +2,17 @@
 
 import re, datetime, json, requests, csv, os, model
 from model import db, User, Favorite, Trail, Review, Images, connect_to_db
-from flask import session
+from flask import session, g, jsonify
 from datetime import datetime
 from geopy.geocoders import Nominatim
 from functools import partial
 
 IMAGE_API_KEY = os.environ['IMAGE_API_KEY']
+
+
+
+
+
 
 #################################################################################
 #                                                                               #
@@ -254,6 +259,42 @@ def add_user_trail_image(user_id, image_url, trail_id):
     )
     db.session.add(new_image)
     db.session.commit()
+
+def save_map_markers():
+    trails_data = []
+
+    all_trails = db.session.query(Trail).all()
+    for trail in all_trails:
+        coords = eval(trail._geoloc)
+        lat = coords['lat']
+        lng = coords['lng']
+        image_url = db.session.query(Images.image_url).filter(Images.trail_id == trail.trail_id).first()
+
+        elevation_gain = str(int(trail.elevation_gain))+ " " + 'feet'
+        route_type = trail.route_type.title()
+        trail_length = "{:.2f}".format(trail.length/5280)
+        formatted_trail_length = str(trail_length) + " " + "miles"
+        image_string = str(image_url)
+        img = eval(image_string)
+
+        trail_info = {
+            "name": trail.name,
+            "city" : trail.city_name,
+            "area_name" : trail.area_name,
+            'lat' : lat,
+            'lng' : lng,
+            'elevation_gain' : elevation_gain,
+            'difficulty_rating' : trail.difficulty_rating,
+            'route_type' : route_type,
+            'length' : formatted_trail_length,
+            "image_url" : img[0],
+        }
+        trails_data.append(trail_info)
+    json_trails_data = json.dumps(trails_data)
+    add_user_image(2, json_trails_data)
+
+
+
 
 ################## Image crud Functions ##################
 

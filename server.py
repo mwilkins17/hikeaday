@@ -1,6 +1,5 @@
 from crypt import methods
-from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
-from random import choice 
+from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for, g
 import http.client, json, requests, datetime, crud, os
 from model import connect_to_db, db, Trail, User, Favorite, Review, Images
 from datetime import datetime
@@ -89,7 +88,7 @@ US_STATES_TO_ABBREV = {
 }
 
 INVERTED_US_STATES_TO_ABBREV = dict(map(reversed, US_STATES_TO_ABBREV.items()))
-print(INVERTED_US_STATES_TO_ABBREV)
+
 ###############################################################################
 #                                                                             #
 #                             NAVIGATION ROUTES                               #
@@ -163,8 +162,9 @@ def trail_search():
 
 @app.route("/trails/all-state", methods=["POST", "GET"])
 def get_trail_data():
+    
+    print(g.ALL_TRAILS_MAP_DATA)
     trails_data = []
-    list_of_trail_dicts = []
 
     trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == session['state_name']).all()
 
@@ -185,6 +185,7 @@ def get_trail_data():
             "image_url" : image_url[0],
         }]
         trails_data.extend(trail_info)
+        
 
     return jsonify(trails_data)
 
@@ -200,44 +201,35 @@ def get_map_data():
         lat = coords['lat']
         lng = coords['lng']
         image_url = db.session.query(Images.image_url).filter(Images.trail_id == trail.trail_id).first()
+        image_string = str(image_url)
+        img = eval(image_string)
+        elevation_gain = str(int(trail.elevation_gain))+ " " + 'feet'
+        route_type = trail.route_type.title()
+        trail_length = "{:.2f}".format(trail.length/5280)
+        formatted_trail_length = str(trail_length) + " " + "miles"
         trail_info =[{
             "name": trail.name,
             "city" : trail.city_name,
             "area_name" : trail.area_name,
             'lat' : lat,
             'lng' : lng,
-            'elevation_gain' : int(trail.elevation_gain),
+            'length' : formatted_trail_length,
+            'elevation_gain' : elevation_gain,
             'difficulty_rating' : trail.difficulty_rating,
-            'route_type' : trail.route_type,
-            # "image_url" : image_url[0],
+            'route_type' : route_type,
+            "image_url" : img[0],
         }]
         trails_data.extend(trail_info)
-
+    
     return jsonify(trails_data)
 
 
 @app.route("/trails/all-trails")
-def get_state_coords():
-        trails_data = []
+def get_all_coords():
 
-        all_trails = db.session.query(Trail).all()
-        for trail in all_trails:
-            coords = eval(trail._geoloc)
-            lat = coords['lat']
-            lng = coords['lng']
-            trail_info = {
-                "name": trail.name,
-                "city" : trail.city_name,
-                "area_name" : trail.area_name,
-                'lat' : lat,
-                'lng' : lng,
-                'elevation_gain' : int(trail.elevation_gain),
-                'difficulty_rating' : trail.difficulty_rating,
-                'route_type' : trail.route_type,
-            }
-            trails_data.append(trail_info)
+        all_trail_markers = db.session.query(Images.image_url).filter(Images.user_id == 2).first()
 
-        return jsonify(trails_data)
+        return all_trail_markers[0]
     
 
 
@@ -305,7 +297,7 @@ def submit_review(trail_name):
     """Get trail details. Page renders dynamically depending on whether
                 or not a user is in the session"""
                 
-    trail = Trail.query.filter(Trail.trail_id == session['trail_id']).first()
+    trail = Trail.query.filter(Trail.name == trail_name).first()
     
     trail_id = trail.trail_id
     session['trail_id'] = trail_id

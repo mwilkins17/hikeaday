@@ -9,7 +9,7 @@ function initMap() {
         lng: stateLng,
       },
       scrollwheel: true,
-      zoom: 6,
+      zoom: 6.5,
       zoomControl: true,
       panControl: false,
       streetViewControl: false,
@@ -29,7 +29,7 @@ function initMap() {
           <a style="text-decoration: none; color: black;" href="trails/${trail.name}">
           <div>
             <div class="row text-center">
-            <div class="col-12"><h5>Trail Name: ${trail.name}</h5></div><br/>
+            <div class="col-12"><h5>${trail.name}</h5></div><br/>
                 <div class="col-3 text-left">
                     <div class="trail--thumbnail">
                       <img style="width:90%"
@@ -42,6 +42,7 @@ function initMap() {
                   
                 <div style="text-align: left;" class="col-8 text-left">
                     <b>National Park: </b>${trail.area_name}<br/>
+                    <b>Length </b>${trail.length}<br/>
                     <b>Elevation Gain: </b>${trail.elevation_gain}<br/>
                     <b>Difficulty Rating: </b>${trail.difficulty_rating}<br/>
                     <b>Route Type: </b>${trail.route_type}<br/>
@@ -57,7 +58,7 @@ function initMap() {
               lat: trail.lat,
               lng: trail.lng,
             },
-            title: `Trail Name: ${trail.name}`,
+            title: `${trail.name}`,
             icon: {
               url: '../static/img/marker.png',
               scaledSize: new google.maps.Size(50, 50),
@@ -68,7 +69,17 @@ function initMap() {
 
           map.addListener('click', () => {
             trailInfo.close()
+            google.maps.event.removeListener(mouseOut);
           })
+
+          trailMarker.addListener("mouseover", () => {
+            trailInfo.setContent(trailInfoContent)
+            trailInfo.open(map, trailMarker);
+          });
+
+          let mouseOut = trailMarker.addListener("mouseout", () => {
+            trailInfo.close();
+          });
 
           trailMarker.addListener('click', () => {
             trailInfo.close();
@@ -76,6 +87,7 @@ function initMap() {
             trailInfo.open(map, trailMarker);
             map.setZoom(12);
             map.setCenter(trailMarker.getPosition());
+            google.maps.event.removeListener(mouseOut);
           });
         }
       })

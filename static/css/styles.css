@@ -2,14 +2,20 @@ img {
   /* width: 100%; */
 }
 
+background-image {
+  height: 25%
+}
+
 body {
-  background-image: url(/static/img/background-hiking.jpg);
+  background-image: url(../img/hikeaday_background.png);
   background-repeat: no-repeat;
+  background-attachment: fixed;
   background-size: cover;
   background-color: #cccccc;
   font-family: 'Nunito Sans', sans-serif;
   max-width: auto;
-  margin: auto;
+
+  padding-bottom: 50px;
 }
 
 h1 {
@@ -100,7 +106,7 @@ h1 {
 }
 
 .trail--info {
-  background: #FFD6BA;
+  background: #ffffff;
   color: black;
   font-size:1em;
   border-radius:10px;
@@ -108,6 +114,21 @@ h1 {
   border-color: #797D62;;
   border-style: solid;
   font-weight: bold;
+}
+
+#trail--header {
+  background-color: rgba(238, 215, 175, 0.93);
+  border-style: solid;
+  border-color: rgb(128, 125, 125);
+  border-radius: 5px;
+  shadow: 
+}
+
+#trail--details {
+  background-color: rgba(238, 215, 175, 0.93);
+  border-style: solid;
+  border-color: rgb(128, 125, 125);
+  border-radius: 5px;
 }
 
 .trail--name {
@@ -155,10 +176,10 @@ placeholder {
   display: inline-block;  
 }
 
-#forecast {
+#forecast--card {
   font-weight: bold;
   color: black;
-  background-color:white;
+  background-color: white;
   border-style: solid;
   border-radius: 15px;
   border-color:#B58463
@@ -169,5 +190,11 @@ placeholder {
   list-style: none;
   padding: 0;
   margin: 1em 0 1em 1em;
+}
+
+#nav-button {
+  text-decoration: none;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 

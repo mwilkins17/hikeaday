@@ -12,45 +12,56 @@
       padding: 0;
     }
   </style>
+
+
+<title>{{trail.name}}</title>
+
 {% endblock %}
 
 {% block body %}
 
+<!-- #################################################################################
 
+                                    # Search Bar
+
+################################################################################# -->
  
 <form id="state--searching--form" action="/trail/state/state" method="POST" class="search--form">
-    <input id="searching" name="state" class="search--input" type="search" placeholder="Search here...">
+    <input id="searching" name="state" class="search--input" type="search" placeholder="Search state name or abbreviation here...">
 </form>
   
-  <script src="../static//js/listenForTrailsLoad.js" ></script>
   <script type="text/javascript" src="../static/js/searchForTrails.js"></script>
   
+<!-- #################################################################################
 
+                            # Trail Header Info
 
-<div>
-    <div class="col-12 col-md-auto text-center mx-auto">
-        <div class="trail--name">
-            <h1>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-signpost-2" viewBox="0 0 16 16">
-                <path d="M7 1.414V2H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h5v1H2.5a1
-                1 0 0 0-.8.4L.725 8.7a.5.5 0 0 0 0 .6l.975 1.3a1 1 0 0 0 .8.4H7v5h2v-5h5a1
-                1 0 0 0 1-1V8a1 1 0 0 0-1-1H9V6h4.5a1 1 0 0 0 .8-.4l.975-1.3a.5.5 0 0 0 0-.6L14.3
-                2.4a1 1 0 0 0-.8-.4H9v-.586a1 1 0 0 0-2 0zM13.5 3l.75 1-.75 1H2V3h11.5zm.5 5v2H2.5l-.75-1 .75-1H14z"/>
-            </svg>
-            {{trail.name}}</h1>
+################################################################################# -->
+
+<div class="container">
+    <div id="trail--header" class="row text-center shadow bg-body rounded" style="margin-top: 20px">
+        <div class="col">
+                <h1>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-signpost-2" viewBox="0 0 16 16">
+                    <path d="M7 1.414V2H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h5v1H2.5a1
+                    1 0 0 0-.8.4L.725 8.7a.5.5 0 0 0 0 .6l.975 1.3a1 1 0 0 0 .8.4H7v5h2v-5h5a1
+                    1 0 0 0 1-1V8a1 1 0 0 0-1-1H9V6h4.5a1 1 0 0 0 .8-.4l.975-1.3a.5.5 0 0 0 0-.6L14.3
+                    2.4a1 1 0 0 0-.8-.4H9v-.586a1 1 0 0 0-2 0zM13.5 3l.75 1-.75 1H2V3h11.5zm.5 5v2H2.5l-.75-1 .75-1H14z"/>
+                </svg>
+                {{trail.name}}</h1>
+            <div class="">{{trail.city_name}}, {{trail.state_name}}</div>
         </div>
     </div>
 </div>
 
+<!-- #################################################################################
 
-    <div style="margin: 10px; text-align: center">
-        <span class="trail--info">Area Name: {{trail.area_name}}</span>
-        <span class="trail--info">State: {{trail.state_name}}</span>
-        <span class="trail--info">City: {{trail.city_name}}</span>
-    </div>
+                            # Trail Images Carousel
 
-<!-- TRAIL IMAGES CAROUSEL -->
-<div class="container">
+################################################################################# -->
+
+
+<div class="container shadow">
     <div class="row">
         <div class="col">
             <div style="background-color: rgb(128, 128, 128, 0.9);" id="carouselExampleControlsNoTouching" class="carousel slide" data-bs-touch="false" data-bs-interval="false" >
@@ -80,7 +91,11 @@
     </div>
 </div>
 
-  
+  <!-- #################################################################################
+
+                            # Trail Map
+
+################################################################################# -->
   
   <script src="../static/js/trailDetailsMap.js"></script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
@@ -88,15 +103,27 @@
   <div id="lat" style="display:none;" >{{lat}}</div>
   <div id="lng" style="display:none;" >{{lng}}</div>
 
-  <!-- FAVORITING BUTTON -->
+<!-- #################################################################################
+
+                            # Favoriting Button
+
+################################################################################# -->
+
+
   <div style="width: 25px; cursor: pointer" id="favorite"></div>
   <script src="../static/js/favorite-click.js"></script>
 
-  <!-- TRAIL DETAIL INFORMATION -->
+<!-- #################################################################################
+
+                            # Trail Details Section
+
+################################################################################# -->
 
 <div class="container" style="color: white; margin-top: 20px">
     <div class="row">
-
+        <div id="trail--details" class="col-12 text-center">
+            <h3>Trail Stats</h3>
+        </div>
         <div class="col-1 col-md-auto text-center mx-auto">
             <div class="trail--info">Trail Length: {{trail.length}} ft</div>
         </div>
@@ -104,39 +131,36 @@
 
             <div class="trail--info"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
-              </svg>
-              Elevation Gain: {{trail.elevation_gain}} ft</div>
+            </svg>
+            Elevation Gain: {{trail.elevation_gain}} ft</div>
         </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-            <div class="trail--info">Difficulty Rating: {{trail.difficulty_rating}}</div>
+            <div class="col-1 col-md-auto text-center mx-auto">
+                <div class="trail--info">Difficulty Rating: {{trail.difficulty_rating}}</div>
+            </div>
+            <div class="col-1 col-md-auto text-center mx-auto">
+                <div class="trail--info">Route Type: {{trail.route_type}}</div>
+            </div>
         </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-            <div class="trail--info">Route Type: {{trail.route_type}}</div>
-        </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-            <div class="trail--info">Average Rating: {{trail.average_rating}}</div><br>
-        </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-            <div class="trail--info">Number of Reviews:
-            {% if session['total_reviews'] %}
+            <div class="col-1 col-md-auto text-center mx-auto">
+                <div class="trail--info">Number of Reviews:
+                {% if session['total_reviews'] %}
 
-            {{session['total_reviews']}}
+                {{session['total_reviews']}}
 
-            {% else %}
+                {% else %}
 
-            {% endif %}
-        </div>
-        </div>
-        <div class="row">
-            
-                {% for feature in features %}
+                {% endif %}
+                </div>
+            </div>
+    <div class="row">
+            {% for feature in features %}
                 <div class="col-1 col-md-auto text-center mx-auto">
                     <div class="trail--info">
                         {{feature}}
                     </div>
                 </div>
-                {% endfor %}
-            </div>
+            {% endfor %}
+    </div>
             
             <div class="col-1 col-md-auto text-center mx-auto">
                 <div class="trail--info">Activities:{% for activity in activities %} {{activity}}<break> {% endfor %}</div>
@@ -155,8 +179,7 @@
 ################################################################################# -->
 
 <div class="container" id="local-weather">
-    <div style="font-weight: bold; color: black; text-align: center; margin: 25px; background-color: white; 
-    border-radius:10px; border-color: #997B66; border-style: solid;">
+    <div class="trail--info">
         <h2 style="text-align: center;">Local Weather</h2>
     </div>
 </div>
@@ -181,7 +204,7 @@
 ################################################################################# -->
 
 
-<div class="container" style="background-color: #D9AE94; margin-top: 30px;">
+<div class="container" style="background-color: #ffffff; margin-top: 30px;">
 
     {% if reviews %}
     <div id="trail--reviews" style="text-align:center; padding-bottom: 50px;"><div></div>
