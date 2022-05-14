@@ -21,12 +21,15 @@
     <div class="text-center shadow" style="background:white; margin-right: auto; margin-left: auto; border-radius: 15px">
       <p>A home to search for National Park trails data, weather, locations, and more!</p>
     </div>
+
     <form id="searching--form" action="/trail/state/state" method="POST" class="search--form">
       <input id="searching" name="state" class="search--input shadow p-3 mb-5 bg-body rounded" type="search" placeholder="Search state name or abbreviation here...">
     </form>
 
     <script src="../static/js/listenForStateSearch.js" ></script>
+
     <div class="shadow p-3 mb-5 bg-body rounded" style="max-width: 100%; padding: 0; margin-left:auto; margin-right: auto; margin-top: 25px" id="map"></div>
+    
     <script type="text/javascript" src="../static/js/getMapAll.js"></script>
     <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
 

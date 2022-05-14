@@ -279,7 +279,7 @@ def submit_review(trail_name):
 
 ###############################################################################
 #                                                                             #
-#                         Google Maps API routes                              #
+#                        Data Routes for Google Maps API                      #
 #                                                                             #
 ###############################################################################
 
@@ -307,36 +307,6 @@ def trail_search():
 
     return redirect('/trails')
 
-
-
-@app.route("/trails/all-state", methods=["POST", "GET"])
-def get_trail_data():
-    
-    print(g.ALL_TRAILS_MAP_DATA)
-    trails_data = []
-
-    trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == session['state_name']).all()
-
-    for trail in trail_data_in_a_state:
-        coords = eval(trail._geoloc)
-        lat = coords['lat']
-        lng = coords['lng']
-        image_url = db.session.query(Images.image_url).filter(Images.trail_id == trail.trail_id).first()
-        trail_info =[{
-            "name": trail.name,
-            "city" : trail.city_name,
-            "area_name" : trail.area_name,
-            'lat' : lat,
-            'lng' : lng,
-            'elevation_gain' : int(trail.elevation_gain),
-            'difficulty_rating' : trail.difficulty_rating,
-            'route_type' : trail.route_type,
-            "image_url" : image_url[0],
-        }]
-        trails_data.extend(trail_info)
-        
-
-    return jsonify(trails_data)
 
 @app.route("/trails/map-state")
 def get_state_map_markers():
@@ -382,6 +352,8 @@ def get_all_map_markers():
         return all_trail_markers[0]
 
 
+
+
 @app.route('/get-trail-details')
 def get_trail_map_details():
     trail = db.session.query(Trail).filter(Trail.trail_id == session['trail_id']).first()
@@ -400,21 +372,30 @@ def get_trail_map_details():
     return jsonify(trail_info)
 
 
+###############################################################################
+#                                                                             #
+#              Routes for Editing/Deleting/Adding Reviews                     #
+#                                                                             #
+###############################################################################
+
 
 @app.route("/api/edit-review", methods=["POST"])
 def edit_review():
+    """Edit a user's review for the user and trail in the session"""
+    
     review = request.json.get("review")
-    trail_name1 = request.json.get("trail_name")
-    print(f'TTTTTTTTTTTTTTTTTTTTTT{trail_name1}TTTTTTTTTTTTTTTTTTTTT')
+
     crud.edit_review(review, session['user_id'], session['trail_id'])
-    # all_reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
-    res = {'success' : True,
+
+    response = {'success' : True,
         'status' : 'Your review has been edited.',
         'review' : review}
-    return res
+    return response
 
 @app.route("/api/delete-review")
 def delete_review():
+    """Delete a user's review for the user and trail in the session"""
+    
     reviewid = crud.get_user_review_id_for_current_trail(session['user_id'], session['trail_Id'])
     Review.query.filter(Review.review_id == reviewid).delete()
     session.modified = True
@@ -424,14 +405,21 @@ def delete_review():
 
 @app.route('/trails/reviews')
 def get_reviews_for_current_trail():
+    """Get all reviews for the current trail in the session"""
+    
     reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
     print(type(reviews))
     return jsonify(reviews)
 
+###############################################################################
+#                                                                             #
+#                           Trail Weather Route                               #
+#                                                                             #
+###############################################################################
 
 @app.route("/trail/weather")
 def get_weather():
-    """Route for getting weather details for each trail"""
+    """Route for getting weather details for the trail in the session"""
     
     trail = Trail.query.filter(Trail.name == session['trail_name']).first()
     url = "https://community-open-weather-map.p.rapidapi.com/forecast"
@@ -461,7 +449,7 @@ def get_weather():
 
 @app.route("/is-favorite")
 def check_if_favorited():
-    """Route to check if a trail is favorited or not"""
+    """Route to check if a trail is favorited or not for a user in the session"""
     favorite_status = crud.is_current_trail_favorited(session['user_id'], session['trail_id'])
     return {"favorited": favorite_status}
 
@@ -552,12 +540,11 @@ def user_log_in():
         flash("Successfully logged in!")
         return redirect("/")
     
-    return redirect("/")
 
 
 @app.route("/logout")
 def logout():
-    """######## Log a user out and remove everything from session ########"""
+    """ Log a user out and remove everything from session """
     
     session.clear()
     
