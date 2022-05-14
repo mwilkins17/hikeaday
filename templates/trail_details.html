@@ -30,7 +30,7 @@
     <input id="searching" name="state" class="search--input" type="search" placeholder="Search state name or abbreviation here...">
 </form>
   
-  <script type="text/javascript" src="../static/js/searchForTrails.js"></script>
+<script type="text/javascript" src="../static/js/searchForTrails.js"></script>
   
 <!-- #################################################################################
 
@@ -38,9 +38,9 @@
 
 ################################################################################# -->
 
-<div class="container">
-    <div id="trail--header" class="row text-center shadow bg-body rounded" style="margin-top: 20px">
-        <div class="col">
+<div class="container" style="rgba(238, 215, 175, 0.95)">
+    <div id="trail--header" class="row text-center" style="margin-top: 20px; padding: 12px">
+        <div class=" trail--header col">
                 <h1>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-signpost-2" viewBox="0 0 16 16">
                     <path d="M7 1.414V2H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h5v1H2.5a1
@@ -49,10 +49,30 @@
                     2.4a1 1 0 0 0-.8-.4H9v-.586a1 1 0 0 0-2 0zM13.5 3l.75 1-.75 1H2V3h11.5zm.5 5v2H2.5l-.75-1 .75-1H14z"/>
                 </svg>
                 {{trail.name}}</h1>
-            <div class="">{{trail.city_name}}, {{trail.state_name}}</div>
+            <div style="font-weight: bold; " class="">{{trail.area_name}} - {{trail.city_name}}, {{trail.state_name}}</div>
         </div>
     </div>
 </div>
+
+<div class="container" ; margin-bottom: 5px;">
+    <div class="row" style="margin-bottom: 5px;">
+        <div class="trail--info col text-center">
+            Length: {{length}}
+        </div>
+        <div class="trail--info col text-center mx-auto">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
+            </svg>
+            Elevation Gain: {{elevation_gain}}
+        </div>
+            <div class="trail--info col text-center mx-auto">
+                Difficulty Rating: {{trail.difficulty_rating}}
+            </div>
+            <div class="trail--info col text-center mx-auto">
+                Route Type: {{route_type}}
+            </div>
+        </div>
 
 <!-- #################################################################################
 
@@ -76,12 +96,12 @@
                     {% endfor %}
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControlsNoTouching" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
                 </button>
             </div>
         </div>
@@ -91,27 +111,18 @@
     </div>
 </div>
 
-  <!-- #################################################################################
+<!-- #################################################################################
 
                             # Trail Map
 
 ################################################################################# -->
   
-  <script src="../static/js/trailDetailsMap.js"></script>
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
-  
-  <div id="lat" style="display:none;" >{{lat}}</div>
-  <div id="lng" style="display:none;" >{{lng}}</div>
+<script src="../static/js/trailDetailsMap.js"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>
 
-<!-- #################################################################################
+<div id="lat" style="display:none;" >{{lat}}</div>
+<div id="lng" style="display:none;" >{{lng}}</div>
 
-                            # Favoriting Button
-
-################################################################################# -->
-
-
-  <div style="width: 25px; cursor: pointer" id="favorite"></div>
-  <script src="../static/js/favorite-click.js"></script>
 
 <!-- #################################################################################
 
@@ -119,57 +130,58 @@
 
 ################################################################################# -->
 
-<div class="container" style="color: white; margin-top: 20px">
-    <div class="row">
-        <div id="trail--details" class="col-12 text-center">
-            <h3>Trail Stats</h3>
-        </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-            <div class="trail--info">Trail Length: {{trail.length}} ft</div>
-        </div>
-        <div class="col-1 col-md-auto text-center mx-auto">
-
-            <div class="trail--info"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
-            </svg>
-            Elevation Gain: {{trail.elevation_gain}} ft</div>
-        </div>
-            <div class="col-1 col-md-auto text-center mx-auto">
-                <div class="trail--info">Difficulty Rating: {{trail.difficulty_rating}}</div>
-            </div>
-            <div class="col-1 col-md-auto text-center mx-auto">
-                <div class="trail--info">Route Type: {{trail.route_type}}</div>
-            </div>
-        </div>
-            <div class="col-1 col-md-auto text-center mx-auto">
-                <div class="trail--info">Number of Reviews:
-                {% if session['total_reviews'] %}
-
-                {{session['total_reviews']}}
-
-                {% else %}
-
-                {% endif %}
-                </div>
-            </div>
-    <div class="row">
+    <div class="row mx">
+        <div class="trail--info col-6 text-center">
+            <h5 style="text-decoration:underline ;" >Features</h5>
             {% for feature in features %}
-                <div class="col-1 col-md-auto text-center mx-auto">
-                    <div class="trail--info">
-                        {{feature}}
-                    </div>
-                </div>
+                <span style="margin: 10px">
+                    {{feature}}
+                </span>
             {% endfor %}
+        </div>
+        <div class=" trail--info col-6 text-center">
+            <h5 style="text-decoration:underline ;" >Activities</h5>
+            {% for activity in activities %}
+                <span style="margin: 10px">
+                    {{activity}}
+                </span>
+            {% endfor %}
+        </div>
     </div>
             
-            <div class="col-1 col-md-auto text-center mx-auto">
-                <div class="trail--info">Activities:{% for activity in activities %} {{activity}}<break> {% endfor %}</div>
+</div>
+
+<!-- #################################################################################
+
+                            # Action Items Toolbar
+
+################################################################################# -->
+<div class="container">
+    <div class="row text-center" style="background-color: rgba(238, 215, 175, 0.366); width: 50%; margin-left: auto; margin-right: auto; margin-top: 30px; border-radius: 105px;">
+        <div class="col text-center" style="margin-left: 20%">
+            <div id="favorite--div" class="btn-circle btn-xl text-center rounded-circle;" style="background-color: white; cursor: pointer">
+                <span class="text-center" style="width: 25px; cursor: pointer;" id="favorite"></span>
+                {% if not session['user_id'] %}
+                    <div style="color: black; padding-top:10px; font-size: 18px "><a href="/login">Log-in</a> or <a href="sign-up">Sign-Up</a> to Favorite This Trail</div>
+                {% else %}
+                    <span style="color: black">Favorite This Trail</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col text-center" style="text-align: center; margin-right: 10%">
+            <div id="directions--div" class="btn-circle btn-xl text-center rounded-circle ;" style="background-color: white; cursor: pointer">
+                <svg id="get--directions" style="cursor: pointer; color: red;" id="get--directions" xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+                <div></div>
+                <span style="color: black">Get Directions</span>
             </div>
         </div>
     </div>
 </div>
-
-
+<script src="../static/js/favorite-click.js"></script>
+<script src="../static/js/getDirections.js"></script>
 
 
 <!-- #################################################################################
@@ -178,7 +190,7 @@
 
 ################################################################################# -->
 
-<div class="container" id="local-weather">
+<div class="container" id="local-weather" style="margin-top:50px">
     <div class="trail--info">
         <h2 style="text-align: center;">Local Weather</h2>
     </div>
@@ -197,6 +209,8 @@
 <script type="text/babel" src="/static/js/Index.jsx"></script>
 
 
+
+
 <!-- #################################################################################
 
                             # Reviews Section
@@ -204,12 +218,12 @@
 ################################################################################# -->
 
 
-<div class="container" style="background-color: #ffffff; margin-top: 30px;">
+<div class="container" style="background-color: rgba(238, 215, 175, 0.95); margin-top: 30px; border-radius:50px; width: 75%">
 
     {% if reviews %}
-    <div id="trail--reviews" style="text-align:center; padding-bottom: 50px;"><div></div>
-    </div>
-    <script src="../static/js/getReviewsForTrail.js"></script>
+        <div id="trail--reviews" style="text-align:center; padding-bottom: 50px;"><div></div>
+        </div>
+        <script src="../static/js/getReviewsForTrail.js"></script>
     {% else %}
         {% if session['user_id'] %}
             <div style="text-align:center; padding-bottom: 50px;">
@@ -313,10 +327,7 @@
 <script async src="../static/js/listenForEditReview.js"></script>
 <!-- <script src="../static/js/deleteReview.js"></script> -->
     <script src="../static/js/editReview.js"></script>
-    
-    <form style="text-align:center;padding-bottom: 50px;" method="POST" action="/trails/delete-post">
-        <input style="width:50%" id="review-submit-reviewed" name="delete-review" type="Submit" Value="Delete Review" />
-    </form>
+
 
     {% elif session['user_id'] %}
 
@@ -333,4 +344,5 @@
     {% endif %}
 
 </div>
+<div style="height: 75px"></div>
 {% endblock %}

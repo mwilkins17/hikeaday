@@ -4,12 +4,6 @@ fetch('/trail/weather')
     let prevDate
     weatherData = responseData.list;
     for (const data of weatherData) {
-        // let forecast = data[0]
-        // alert(data.main.weather)
-        // alert(Date(data.dt))
-        // console.log(Object.keys(weatherData).length);
-        // const weather_card = document.createElement("div");
-        // weather_card.id = i;
         let feels_like = `<span id="feels-like">Feels like: ${JSON.stringify(Math.round((data.main.feels_like - 273.15) * 1.8 +32))}\u00B0</span>`;
         let temp_min = `<span id="temp_min">Low: ${JSON.stringify(Math.round((data.main.temp_min- 273.15) * 1.8 +32))}\u00B0</span>`;
         let temp_max = `<span id="max">High: ${JSON.stringify(Math.round((data.main.temp_max- 273.15) * 1.8 +32))}\u00B0</span>`;

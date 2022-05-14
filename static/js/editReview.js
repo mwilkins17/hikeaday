@@ -4,6 +4,7 @@ document.getElementById('review--form').addEventListener('submit', (evt) => {
     
     const formInputs = {
     review: document.getElementById('edited--review').value,
+    trail_name : document.getElementById('trail_name').innerText,
     };
 
     fetch('/api/edit-review', {
@@ -15,6 +16,7 @@ document.getElementById('review--form').addEventListener('submit', (evt) => {
     })
     .then((response) => response.json())
     .then((responseJSON) => {
+        alert(document.getElementById('trail_name').innerText)
         document.getElementById('this--review').innerHTML = `${responseJSON.review}`;
     });
 });

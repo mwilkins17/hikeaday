@@ -20,8 +20,8 @@
 {% block body %}
 <div id="state--search" ></div>
 
-<form id="state--searching--form" action="/trail/state/state" method="POST" class="search--form">
-  <input id="searching" name="state" class="search--input shadow p-3 mb-5 bg-body rounded" type="search" placeholder="Search state name or abbreviation here...">
+<form id="state--searching--form" action="/trail/state/state" method="POST" class="search--form ">
+  <input id="searching" name="state" class="search--input shadow" type="search" placeholder="Search state name or abbreviation here...">
 </form>
 
 <script src="../static//js/listenForTrailsLoad.js" ></script>
@@ -30,14 +30,14 @@
 
 <div id="state--trails" >
   
-  <h1 id="state--name" style="background-color: white; border-radius:15px;margin-left: auto; margin-right: auto; width:50%; margin-top: 15px; text-align: center;">{{session['state_name']}} National Park Trails</h1>
+  <h1 id="state--name" class="shadow" style="background-color: white; border-radius:15px;margin-left: auto; margin-right: auto; width:50%; margin-top: 15px; text-align: center;">{{session['state_name']}} National Park Trails</h1>
   <div class="container w-50">
     <div style="text-align: center;" class="row">
       <div class="col-6 mx-auto">
-        <button id="map--btn" type="button" class="btn btn-primary btn-lg w-100">Map</button>
+        <button id="map--btn" type="button" class="btn btn-primary btn-lg w-100 shadow">Map</button>
       </div>
       <div class="col-6 mx-auto">
-        <button id="list--btn" type="button" class="btn btn-primary btn-lg w-100">List</button>
+        <button id="list--btn" type="button" class="btn btn-primary btn-lg w-100 shadow">List</button>
       </div>
     </div>
   </div>
@@ -57,6 +57,7 @@
 
 
   <div class="shadow p-3 mb-5 bg-body rounded" style="max-width: 100%; padding: 0; margin-left: auto; margin-right: auto; margin-top: 15px" id="map"></div>
+  <div style="height: 75px"></div>
 
   <script src="../static/js/maps.js"></script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3Ub91O7c0vT22NdBJ9ID0BnWwH2frQWw&callback=initMap"></script>

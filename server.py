@@ -99,17 +99,18 @@ INVERTED_US_STATES_TO_ABBREV = dict(map(reversed, US_STATES_TO_ABBREV.items()))
 
 @app.route("/")
 def index():
+    """ Render the home page """
         
     return render_template('index.html')
 
 @app.route("/contact")
 def contact():
-    
+    """ *Not in use currently* Render the contact page """
     return render_template('contact.html')
 
 @app.route("/about")
 def about():
-    
+    """ *Not in use currently* Render the about page """
     return render_template('about.html')
 
 
@@ -122,7 +123,7 @@ def about():
 
 @app.route("/trails", methods=["GET"])
 def trails():
-    """######## Render the trails.html route ########"""
+    """ Render the trails.html route """
 
     return render_template('trails.html')
 
@@ -134,9 +135,157 @@ def trails():
 #   ----------------------------------------------------------------
 
 
+@app.route("/trails/<trail_name>")
+def trail_details(trail_name):
+    """######## Get the details page of a trail ########"""
+
+    trail = db.session.query(Trail).filter(Trail.name == trail_name).first()
+    trail_id = trail.trail_id
+    session['trail_id'] = trail.trail_id
+
+    session['trail_name'] = trail_name
+    features = crud.get_features(trail_id)
+    activities = crud.get_activities(trail_id)
+    
+    trail_len = "{:.2f}".format(trail.length/5280)
+    length = str(trail_len) + " " + "miles"
+    elevation_gain = str(int(trail.elevation_gain))+ " " + 'ft'
+    route_type = trail.route_type.title()
+    
+    reviews = crud.get_all_reviews_by_current_trail(trail_id)
+    
+    trail_images = crud.get_all_trail_images_for_current_trail(session['trail_id'])
+    coords = eval(trail._geoloc)
+    lat = coords['lat']
+    lng = coords['lng']
+
+    active_image = trail_images[1]
+    if session.get('user_id'):
+        reviewed = crud.did_user_review(session['user_id'], trail_id)
+        review_text = crud.get_user_review_for_current_trail(session['user_id'], trail_id)
+        return render_template("/trail_details.html",
+                            active_image = active_image,
+                            route_type=route_type,
+                            length=length,
+                            elevation_gain = elevation_gain,
+                            reviewed=reviewed,
+                            review_text=review_text,
+                            reviews=reviews,
+                            trail=trail,
+                            features=features,
+                            activities=activities,
+                            trail_images = trail_images,
+                            lat=lat,
+                            lng=lng)
+    
+    else:
+        reviewed=False
+        return render_template("/trail_details.html",
+                            active_image=active_image,
+                            route_type=route_type,
+                            length=length,
+                            elevation_gain = elevation_gain,
+                            reviewed=reviewed,
+                            trail=trail,
+                            reviews=reviews,
+                            features=features,
+                            activities=activities,
+                            trail_images = trail_images,
+                            lat=lat,
+                            lng=lng)
+
+
+
+@app.route("/trails/<trail_name>", methods=["POST"])
+def submit_review(trail_name):
+    """Get trail details. Page renders dynamically depending on whether
+                or not a user is in the session"""
+                
+    trail = Trail.query.filter(Trail.name == session['trail_name']).first()
+    
+    trail_id = trail.trail_id
+    session['trail_id'] = trail_id
+    
+    trail_name = session['trail_name']
+    
+    trail_len = "{:.2f}".format(trail.length/5280)
+    length = str(trail_len) + " " + "miles"
+    elevation_gain = str(int(trail.elevation_gain))+ " " + 'ft'
+    
+    route_type = trail.route_type.title()
+    
+    features = crud.get_features(trail_id)
+    activities = crud.get_activities(trail_id)
+    
+    user_id = session['user_id']
+    review = request.form.get("new-review")
+
+    reviews= crud.get_all_reviews_by_current_trail(session['trail_id'])
+    user_review = crud.did_user_review(user_id, trail_id)
+    
+    delete_review = request.form.get('delete-review')
+    edited_review = request.form.get('edit-review')
+    
+    if session['user_id']:
+        if user_review:
+
+                reviewed = True
+                review_text = crud.get_user_review_for_current_trail(user_id, trail_id)
+                
+                if edited_review:
+                    crud.edit_review(edited_review, user_id, trail_id)
+                    review_text = edited_review
+                    return redirect(f"/trails/{trail_name}")
+                
+                if delete_review:
+                    reviewid = crud.get_user_review_id_for_current_trail(user_id, trail_id)
+                    Review.query.filter(Review.review_id == reviewid).delete()
+                    session.modified = True
+                    db.session.commit()
+                    flash('Your review has been deleted')
+                    return redirect(f"/trails/{trail_name}")
+                
+                
+                return render_template("/trail_details.html",
+                                        route_type=route_type,
+                                        length=length,
+                                        elevation_gain = elevation_gain,
+                                        reviewed=reviewed,
+                                        review_text=review_text,
+                                        trail=trail,
+                                        reviews=reviews,
+                                        features=features,
+                                        activities=activities)
+        else:
+            ###### Instantiate a Review / Create a Review ######
+            crud.create_review(user_id=user_id,
+                               trail_id=trail_id,
+                               num_stars=4,
+                               review_text=review)
+            
+            return redirect(f'/trails/{trail_name}')
+    
+    else:
+        reviewed = False
+        return render_template("/trail_details.html",
+                               route_type=route_type,
+                               length=length,
+                               elevation_gain = elevation_gain,
+                               reviewed=reviewed,
+                               trail=trail,
+                               reviews=reviews,
+                               features=features,
+                               activities=activities)   
+
+###############################################################################
+#                                                                             #
+#                         Google Maps API routes                              #
+#                                                                             #
+###############################################################################
+
 @app.route("/trail/state/state", methods=["POST"])
 def trail_search():    
-    """######## Search for a trail ########"""
+    """ Search for a trail  by state """
 
     state = request.form.get('state')
 
@@ -190,9 +339,10 @@ def get_trail_data():
     return jsonify(trails_data)
 
 @app.route("/trails/map-state")
-def get_map_data():
+def get_state_map_markers():
+    """Retrieve map markers for state search"""
+    
     trails_data = []
-    list_of_trail_dicts = []
     
     trail_data_in_a_state = db.session.query(Trail).filter(Trail.state_name == session['state_name']).all()
 
@@ -225,149 +375,37 @@ def get_map_data():
 
 
 @app.route("/trails/all-trails")
-def get_all_coords():
-
+def get_all_map_markers():
+        """ Retrieve coordinates from database for every trail"""
         all_trail_markers = db.session.query(Images.image_url).filter(Images.user_id == 2).first()
 
         return all_trail_markers[0]
-    
 
 
-#   ----------------------------------------------------------------
-
-#       RENDER TRAILS.HTMLTEMPLATE & DISPLAY TRAIL DETAILS,
-#          TRAIL REVIEWS, AND TRAIL WEATHER
-
-#   ----------------------------------------------------------------
-
-
-@app.route("/trails/<trail_name>")
-def trail_details(trail_name):
-    """######## Get the details page of a trail ########"""
-
-    trail = db.session.query(Trail).filter(Trail.name == trail_name).first()
-    trail_id = trail.trail_id
-    session['trail_id'] = trail.trail_id
-
-    session['trail_name'] = trail_name
-    features = crud.get_features(trail_id)
-    activities = crud.get_activities(trail_id)
-    
-    
-    reviews = crud.get_all_reviews_by_current_trail(trail_id)
-    
-    trail_images = crud.get_all_trail_images_for_current_trail(session['trail_id'])
+@app.route('/get-trail-details')
+def get_trail_map_details():
+    trail = db.session.query(Trail).filter(Trail.trail_id == session['trail_id']).first()
+   
     coords = eval(trail._geoloc)
     lat = coords['lat']
     lng = coords['lng']
+    
+    trail_info = [
+    {
+        "name": trail.name,
+        'lat' : lat,
+        'lng' : lng,
+    }]
+    
+    return jsonify(trail_info)
 
-    active_image = trail_images[1]
-    if session.get('user_id'):
-        reviewed = crud.did_user_review(session['user_id'], trail_id)
-        review_text = crud.get_user_review_for_current_trail(session['user_id'], trail_id)
-        return render_template("/trail_details.html",
-                            active_image = active_image,
-                            reviewed=reviewed,
-                            review_text=review_text,
-                            reviews=reviews,
-                            trail=trail,
-                            features=features,
-                            activities=activities,
-                            trail_images = trail_images,
-                            lat=lat,
-                            lng=lng)
-    
-    else:
-        reviewed=False
-        return render_template("/trail_details.html",
-                            active_image=active_image,
-                            reviewed=reviewed,
-                            trail=trail,
-                            reviews=reviews,
-                            features=features,
-                            activities=activities,
-                            trail_images = trail_images,
-                            lat=lat,
-                            lng=lng)
-
-
-
-@app.route("/trails/<trail_name>", methods=["POST"])
-def submit_review(trail_name):
-    """Get trail details. Page renders dynamically depending on whether
-                or not a user is in the session"""
-                
-    trail = Trail.query.filter(Trail.name == trail_name).first()
-    
-    trail_id = trail.trail_id
-    session['trail_id'] = trail_id
-    
-    trail_name = session['trail_name']
-    
-    
-    features = crud.get_features(trail_id)
-    activities = crud.get_activities(trail_id)
-    
-    user_id = session['user_id']
-    
-    review = request.form.get("new-review")
-
-    reviews= crud.get_all_reviews_by_current_trail(session['trail_id'])
-    user_review = crud.did_user_review(user_id, trail_id)
-    
-    session['total_reviews'] = len(crud.get_all_current_user_reviews(user_id))
-    
-    delete_review = request.form.get('delete-review')
-    edited_review = request.form.get('edit-review')
-    
-    if session['user_id']:
-        if user_review:
-
-                reviewed = True
-                review_text = crud.get_user_review_for_current_trail(user_id, trail_id)
-                
-                if edited_review:
-                    crud.edit_review(edited_review, user_id, trail_id)
-                    review_text = edited_review
-                    return redirect(f"/trails/{trail_name}")
-                
-                if delete_review:
-                    reviewid = crud.get_user_review_id_for_current_trail(user_id, trail_id)
-                    Review.query.filter(Review.review_id == reviewid).delete()
-                    session.modified = True
-                    db.session.commit()
-                    return redirect(f"/trails/{trail_name}")
-                
-                
-                return render_template("/trail_details.html",
-                                        reviewed=reviewed,
-                                        review_text=review_text,
-                                        trail=trail,
-                                        reviews=reviews,
-                                        features=features,
-                                        activities=activities)
-        else:
-            ###### Instantiate a Review / Create a Review ######
-            crud.create_review(user_id=user_id,
-                               trail_id=trail_id,
-                               num_stars=4,
-                               review_text=review)
-            
-            return redirect(f'/trails/{trail_name}')
-    
-    else:
-        reviewed = False
-        return render_template("/trail_details.html",
-                               reviewed=reviewed,
-                               trail=trail,
-                               reviews=reviews,
-                               features=features,
-                               activities=activities)   
 
 
 @app.route("/api/edit-review", methods=["POST"])
 def edit_review():
     review = request.json.get("review")
+    trail_name1 = request.json.get("trail_name")
+    print(f'TTTTTTTTTTTTTTTTTTTTTT{trail_name1}TTTTTTTTTTTTTTTTTTTTT')
     crud.edit_review(review, session['user_id'], session['trail_id'])
     # all_reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
     res = {'success' : True,
@@ -389,36 +427,6 @@ def get_reviews_for_current_trail():
     reviews = crud.get_all_reviews_by_current_trail(session['trail_id'])
     print(type(reviews))
     return jsonify(reviews)
-
-
-
-@app.route('/get-trail-details')
-def get_trail_details():
-    trail = db.session.query(Trail).filter(Trail.trail_id == session['trail_id']).first()
-    features = crud.get_features(session['trail_id'])
-    activities = crud.get_activities(session['trail_id'])
-    image_url = db.session.query(Images.image_url).filter(Images.trail_id == session['trail_id']).first()
-    
-    coords = eval(trail._geoloc)
-    lat = coords['lat']
-    lng = coords['lng']
-    
-    trail_info = [
-    {
-        "name": trail.name,
-        "city" : trail.city_name,
-        "area_name" : trail.area_name,
-        'lat' : lat,
-        'lng' : lng,
-        'elevation_gain' : int(trail.elevation_gain),
-        'difficulty_rating' : trail.difficulty_rating,
-        'route_type' : trail.route_type,
-        "image_url" : image_url[0],
-        'features' : features,
-        'activities' : activities,
-    }]
-    
-    return jsonify(trail_info)
 
 
 @app.route("/trail/weather")
@@ -573,15 +581,15 @@ def get_profile():
     
 @app.route('/profile-info')
 def get_profile_info():
-    """Route for AJAX request for updating profile info"""
+    """Route for AJAX request for getting profile info"""
     
     user = crud.get_user_by_username(session['username'])
     
     user_reviews = crud.get_all_current_user_reviews(session['user_id'])
 
-    favorite_trails = crud.get_all_trail_names_for_favorited_trails(session['user_id'])
-    
-
+    favorite_trails = crud.get_all_trail_names_for_favorited_trails(session['user_id'])    
+    print(favorite_trails)
+        
     username = user.username
     email = user.email
     first_name = user.fname
@@ -589,7 +597,7 @@ def get_profile_info():
 
     user_info = {
         "user_reviews" : user_reviews,
-        "user_favorites" : favorite_trails,
+        "favorites" : favorite_trails,
         "username" : username,
         "email" : email,
         "fname" : first_name,

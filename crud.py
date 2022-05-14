@@ -214,8 +214,21 @@ def get_all_trail_names_for_favorited_trails(user_id):
 
     trail_names_list = []
     for favorite in favorites:
-        trail_name = db.session.query(Trail.name).filter(Trail.trail_id == favorite.trail_id).first()
-        trail_names_list.append(trail_name._asdict())
+        trails = db.session.query(Trail).filter(Trail.trail_id == favorite.trail_id).all()
+        for trail in trails:
+            if favorite.trail_id == trail.trail_id:
+                
+                date = str(favorite.created_at)
+                create_date = date[:10]
+                
+                fav_info = {
+                    'trail_name' : trail.name,
+                    'trail_city' : trail.city_name,
+                    'trail_state' : trail.state_name,
+                    'created' : create_date
+                }
+                
+                trail_names_list.append(fav_info)
     return trail_names_list
 
 #################################################################################
