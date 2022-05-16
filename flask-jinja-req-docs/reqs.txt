@@ -1,7 +1,0 @@
-mkdir templates
-mkdir static
-touch server.py
-mkdir css > static
-mkdir js > static
-base.html > templates
-index.html > templates
