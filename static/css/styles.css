@@ -2,6 +2,12 @@ img {
   /* width: 100%; */
 }
 
+html {
+  overflow: -moz-scrollbars-vertical; 
+  overflow-y: scroll;
+}
+
+
 background-image {
   height: 25%
 }
