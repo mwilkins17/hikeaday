@@ -156,13 +156,14 @@
                             # Action Items Toolbar
 
 ################################################################################# -->
+
 <div class="container">
     <div class="row text-center" style="background-color: rgba(238, 215, 175, 0.366); width: 50%; margin-left: auto; margin-right: auto; margin-top: 30px; border-radius: 105px;">
         <div class="col text-center" style="margin-left: 20%">
             <div id="favorite--div" class="btn-circle btn-xl text-center rounded-circle;" style="background-color: white; cursor: pointer">
                 <span class="text-center" style="width: 25px; cursor: pointer;" id="favorite"></span>
                 {% if not session['user_id'] %}
-                    <div style="color: black; padding-top:10px; font-size: 18px "><a href="/login">Log-in</a> or <a href="sign-up">Sign-Up</a> to Favorite This Trail</div>
+                    <div style="color: black; padding-top:10px; font-size: 18px "><a href="login">Log-in</a> or <a href="sign-up">Sign-Up</a> to Favorite This Trail</div>
                 {% else %}
                     <span style="color: black">Favorite This Trail</span>
                 {% endif %}
