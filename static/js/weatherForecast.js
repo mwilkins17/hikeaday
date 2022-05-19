@@ -28,7 +28,7 @@ fetch('/trail/weather')
         }
         else {
         document.getElementById('forecast').insertAdjacentHTML("beforeend", `
-        <div id="forecast--card" class="col text-center">
+        <div id="forecast--card" class="col-2 text-center">
               <div class="row">
               </div>
               <h7 style="font-size: 14px" >${dayName}, ${monthName} ${dayNum}, ${year}</h7>

@@ -38,8 +38,8 @@
 
 ################################################################################# -->
 
-<div class="container" style="rgba(238, 215, 175, 0.95)">
-    <div id="trail--header" class="row text-center" style="margin-top: 20px; padding: 12px">
+<div class="container">
+    <div id="trail--header" class="row text-center" style="margin-top:20px; padding: 12px">
         <div class=" trail--header col">
                 <h1>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-signpost-2" viewBox="0 0 16 16">
@@ -81,13 +81,13 @@
 ################################################################################# -->
 
 
-<div class="container shadow">
+<div class="container shadow" style="max-width: 100%">
     <div class="row">
-        <div class="col">
+        <div class="col-6">
             <div style="background-color: rgb(128, 128, 128, 0.9);" id="carouselExampleControlsNoTouching" class="carousel slide" data-bs-touch="false" data-bs-interval="false" >
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img style="height: 500px; margin:auto;" src="{{active_image[0]}}" class="d-block w-5" alt="">
+                        <img style="height: 500px; width: auto; margin:auto;" src="{{active_image[0]}}" class="d-block w-5" alt="">
                     </div>
                     {% for image in trail_images %}
                         <div class="carousel-item">
@@ -105,8 +105,8 @@
                 </button>
             </div>
         </div>
-        <div class="col">
-            <div style="max-width: 100%; padding: 0; margin:0" id="map"></div>
+        <div class="col-6">
+            <div style="width: 100%; padding: 0; margin:0" id="map"></div>
         </div>
     </div>
 </div>
@@ -157,13 +157,13 @@
 
 ################################################################################# -->
 
-<div class="container">
-    <div class="row text-center" style="background-color: rgba(238, 215, 175, 0.366); width: 50%; margin-left: auto; margin-right: auto; margin-top: 30px; border-radius: 105px;">
+<div class="container" style="width:100%">
+    <div class="row" style="background-color: rgba(238, 215, 175, 0.366); width: 50%; margin-left: auto; margin-right: auto; margin-top: 30px; border-radius: 105px;">
         <div class="col text-center" style="margin-left: 20%">
             <div id="favorite--div" class="btn-circle btn-xl text-center rounded-circle;" style="background-color: white; cursor: pointer">
                 <span class="text-center" style="width: 25px; cursor: pointer;" id="favorite"></span>
                 {% if not session['user_id'] %}
-                    <div style="color: black; padding-top:10px; font-size: 18px "><a href="login">Log-in</a> or <a href="sign-up">Sign-Up</a> to Favorite This Trail</div>
+                    <div style="color: black; padding-top:10px; font-size: 18px "><a href="/login">Log-in</a> or <a href="/sign-up">Sign-Up</a> to Favorite This Trail</div>
                 {% else %}
                     <span style="color: black">Favorite This Trail</span>
                 {% endif %}
@@ -219,24 +219,24 @@
 ################################################################################# -->
 
 
-<div class="container" style="background-color: rgba(238, 215, 175, 0.95); margin-top: 30px; border-radius:50px; width: 75%">
+<div class="container" style="background-color: rgba(238, 215, 175, 0.95); margin-top: 30px; border-radius:50px; width: 75%; padding-top: 25px">
 
     {% if reviews %}
         <div id="trail--reviews" style="text-align:center; padding-bottom: 50px;"><div></div>
         </div>
         <script src="../static/js/getReviewsForTrail.js"></script>
-    {% else %}
-        {% if session['user_id'] %}
-            <div style="text-align:center; padding-bottom: 50px;">
-                <h2>There are no reviews for this trail yet.</h2>
-                <h3>Be the first one!</h3>
-            </div>
         {% else %}
-        <div style="text-align:center; padding-bottom: 50px;">
-            <h2>There are no reviews for this trail yet.</h2>
-            <h3><a href="/sign-up">Sign up </a>and be the first!</h3>
-        </div>
-        {% endif %}
+            {% if session['user_id'] %}
+                <div style="text-align:center; padding-bottom: 50px;">
+                    <h2>There are no reviews for this trail yet.</h2>
+                    <h3>Be the first one!</h3>
+                </div>
+            {% elif not session['user_id'] %}
+                <div style="text-align:center; padding-bottom: 50px;">
+                    <h2>There are no reviews for this trail yet.</h2>
+                    <h3><a href="/sign-up">Sign up</a> and be the first!</h3>
+                </div>
+            {% endif %}
     {% endif %}
 
     {% if reviewed %}

@@ -40,4 +40,4 @@ function toggleFavorite() {
 }
 
 document.getElementById('favorite--div').addEventListener("click", toggleFavorite);
-document.getElementById('favorite').addEventListener("click", toggleFavorite);
+// document.getElementById('favorite').addEventListener("click", toggleFavorite);
