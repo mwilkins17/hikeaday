@@ -35,7 +35,7 @@
       <nav class="navbar navbar-expand-md" style="background-color: #6793d53c; " >
         <div class="container-fluid" >
           <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-            <ul class="navbar-nav" style="margin-left:250px" >
+            <ul class="navbar-nav">
               <li><a id="nav-button" class="btn btn-secondary btn-lg" href="/">Home</a></li>
               <!-- <li><a id="nav-button" class="btn btn-secondary btn-lg" href="/about">About</a></li> -->
             </ul>
@@ -48,7 +48,7 @@
               <span class="navbar-toggler-icon"></span>
             </button>
           </div>
-          <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+          <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" style="position:relative">
             <ul class="navbar-nav ms-auto">
               {% if session['username'] %}
               <li>
@@ -58,7 +58,7 @@
               </li>
               </ul>
               {% endif %}
-              <ul class="navbar-nav" style="margin-right:250px">
+              <ul class="navbar-nav">
                 {% if session['username'] %}
                     <li><a id="nav-button" class="btn btn-secondary btn-lg" href="/profile">Profile</a></li>
                     <li><a id="nav-button" class="btn btn-secondary btn-lg" href="/logout">Logout</a></li>
