@@ -75,7 +75,7 @@ Google Maps Javascript, Open Weather Map API
 
 
 ## <a name="installation"></a>![trail_name_icon](https://user-images.githubusercontent.com/100727077/168654942-fe59c639-2c1a-49f0-abf7-aff1a9c268ce.png) Set-up & Installation
-Install a code editor such as [VS code](https://code.visualstudio.com/download) or [Sublime Text](https://www.sublimetext.com/).<br>
+Install a code editor such as [VS code](https://code.visualstudio.com/download).<br>
 Install [Python3](https://www.python.org/downloads/)<br>
 Install [pip](https://pip.pypa.io/en/stable/installation/), the package installer for Python <br>
 Install [postgreSQL](https://www.postgresql.org/) for the relational database.<br>
