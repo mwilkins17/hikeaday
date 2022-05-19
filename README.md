@@ -1,7 +1,7 @@
 # hikeAday ![trail_name_icon](https://user-images.githubusercontent.com/100727077/168654942-fe59c639-2c1a-49f0-abf7-aff1a9c268ce.png)
  
 ![](file:///Users/victorsi/Desktop/Screen%20Shot%202020-03-14%20at%2012.44.09%20AM.png)<br>
-hikeAday is a full-stack web application where you can look up National Park trails information. You can see trail deatils, see the local weather forecast for a trail, keep track of your favorite trail, and review trails. <br>
+hikeAday is a full-stack web application where you can look up National Park trails information. You can see trail details, see the local weather forecast for a trail, keep track of your favorite trail, and review trails. <br>
 
 💻 Deployment Link: https://hikeaday.app
 <br>
@@ -83,7 +83,7 @@ Install [postgreSQL](https://www.postgresql.org/) for the relational database.<b
 
 Clone or fork repository:
 ```
-$ git clone https://github.com/anjelicasilva/ISpeakPlantish.git
+$ git clone https://github.com/mwilkins/hikeaday
 ```
 Create and activate a virtual environment inside the hikeAday directory:
 ```
