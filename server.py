@@ -421,10 +421,12 @@ def get_reviews_for_current_trail():
 def get_weather():
     """Route for getting weather details for the trail in the session"""
     
-    trail = Trail.query.filter(Trail.name == session['trail_name']).first()
-    url = "https://community-open-weather-map.p.rapidapi.com/forecast"
-
-    querystring = {"q":f"{trail.city_name},{trail.state_name}"}
+    trail = Trail.query.filter(Trail.trail_id == session['trail_id']).first()
+    url = "https://community-open-weather-map.p.rapidapi.com/forecast/daily"
+    coords = eval(trail._geoloc)
+    lat = str(coords['lat'])
+    lng = str(coords['lng'])
+    querystring = {"q":f'{trail.city_name}, US', 'lat' : f'{lat}', 'lon':f'{lng}', 'units':'imperial'}
 
     headers = {
         "X-RapidAPI-Host": "community-open-weather-map.p.rapidapi.com",
@@ -434,9 +436,8 @@ def get_weather():
     }
     
     response = requests.request("GET", url, headers=headers, params=querystring)
-    
     weather_dict = response.json()
-
+    print(response.json())
     return weather_dict
 
 
@@ -451,7 +452,10 @@ def get_weather():
 def check_if_favorited():
     """Route to check if a trail is favorited or not for a user in the session"""
     favorite_status = crud.is_current_trail_favorited(session['user_id'], session['trail_id'])
-    return {"favorited": favorite_status}
+    if favorite_status == False:
+        return {"favorited": False}
+    else:
+        return {"favorited": True}
 
 
 @app.route("/update-favorite")

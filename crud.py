@@ -81,11 +81,13 @@ def get_all_favorites_by_user(user_id):
 
 def is_current_trail_favorited(user_id, trail_id):
     """Check the database to see if the current trail is favorited"""
-
-    is_Favorited = db.session.query(Favorite.favorite_id
+    if session['user_id']:
+        is_Favorited = db.session.query(Favorite.favorite_id
                                                  ).filter(
                                                      Favorite.user_id == user_id, Favorite.trail_id == trail_id).all()
-
+    else:
+        is_Favorited = None
+        
     if is_Favorited:
         return True
     else:
@@ -495,13 +497,16 @@ def get_features(trail_id):
     if 'dogs' in features_list[0].lower():
         dogs_allowed = features_list[0].split('-')
         
-        if dogs_allowed[1].lower() == "yes":
+        if "yes" in dogs_allowed[0].lower():
             formatted_dogs_allowed = "Dogs Allowed"
             features_list[0] = formatted_dogs_allowed
-        else:
+        if "no" in dogs_allowed[0].lower():
             formatted_dogs_allowed = "No Dogs"
             features_list[0] = formatted_dogs_allowed
-    
+        if dogs_allowed[0].lower() == "dogs":
+            formatted_dogs_allowed = "Dogs Allowed"
+            features_list[0] = formatted_dogs_allowed
+            
     for i in range(len(features_list)):
         if features_list[i] == 'Kids':
             features_list[i]= 'Family-Friendly'

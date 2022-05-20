@@ -66,9 +66,9 @@ Keep track of reviews and your favorite trails in the user Profile page
 
 ## <a name="techstack"></a>![trail_name_icon](https://user-images.githubusercontent.com/100727077/168654942-fe59c639-2c1a-49f0-abf7-aff1a9c268ce.png) Technologies and Stack
 **Backend:**
-Python, Flask, SQLAlchemy, PostgreSQL, FlaskSocketIO <br>
+Python, Flask, SQLAlchemy, PostgreSQL, Jinja, Javascript(AJAX, JSON) <br>
 **Frontend:**
-React, Javascript, jQuery, Babel, Bootstrap, Google Fonts, HTML5, CSS3 <br>
+Javascript, Bootstrap, Google Fonts, HTML5, CSS3 <br>
 **APIs:**
 Google Maps Javascript, Open Weather Map API
 
