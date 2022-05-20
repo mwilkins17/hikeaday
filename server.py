@@ -333,6 +333,7 @@ def get_reviews_for_current_trail():
     print(type(reviews))
     return jsonify(reviews)
 
+
 ###############################################################################
 #                                                                             #
 #                           Trail Weather Route                               #
@@ -352,14 +353,12 @@ def get_weather():
 
     headers = {
         "X-RapidAPI-Host": "community-open-weather-map.p.rapidapi.com",
-        "X-RapidAPI-Key": WEATHER_API_KEY,
-        "units": "imperial",
-        "content-type": "text/plain; charset=utf-8",
+        "X-RapidAPI-Key": WEATHER_API_KEY
     }
     
     response = requests.request("GET", url, headers=headers, params=querystring)
     weather_dict = response.json()
-    print(response.json())
+
     return weather_dict
 
 
@@ -432,8 +431,6 @@ def register_user():
 
             flash("User created successfully; you may now log in")
             return redirect("/login")
-            
-        return redirect('/')
     
     
 @app.route("/login")
@@ -518,6 +515,7 @@ def get_profile_info():
     }
     
     return user_info
+
 
 
 if __name__ == '__main__':

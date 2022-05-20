@@ -16,7 +16,6 @@ document.getElementById('review--form').addEventListener('submit', (evt) => {
     })
     .then((response) => response.json())
     .then((responseJSON) => {
-        alert(document.getElementById('trail_name').innerText)
         document.getElementById('this--review').innerHTML = `${responseJSON.review}`;
     });
 });
