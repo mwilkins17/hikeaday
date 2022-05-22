@@ -306,7 +306,7 @@ def edit_review():
     """Edit a user's review for the user and trail in the session"""
     
     review = request.json.get("review")
-
+    
     crud.edit_review(review, session['user_id'], session['trail_id'])
 
     response = {'success' : True,

@@ -126,7 +126,7 @@ class Favorite(db.Model):
     
     favorite_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'), nullable=False, unique=True)
+    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     
     users = db.relationship("User", back_populates="favorites")

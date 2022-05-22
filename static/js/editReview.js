@@ -1,4 +1,4 @@
-document.getElementById('review--form').addEventListener('submit', (evt) => {
+document.getElementById('review--form').addEventListener('click', (evt) => {
     evt.preventDefault();
     
     

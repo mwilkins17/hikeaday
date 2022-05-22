@@ -1,4 +1,3 @@
-
 fetch('/is-favorite')
 .then(response => response.json())
 .then(currentFavorite => {
