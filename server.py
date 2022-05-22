@@ -411,6 +411,7 @@ def register_user():
         password_repeat = request.form.get("password-repeat")
         user = crud.get_user_by_email(email)
         user_username = crud.get_user_by_username(username)
+        print(password_repeat, password)
 
         if user:
             flash("A user with that email already exists")
