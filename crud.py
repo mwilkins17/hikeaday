@@ -209,14 +209,12 @@ def get_trail_name_by_trail_id(trail_id):
 def get_all_trail_names_for_favorited_trails(user_id):
     """Get all the favorites for the user in the Flask session"""
 
-    favorites = Favorite.query.filter(
-        User.user_id == user_id).all()
+    favorites = Favorite.query.filter(Favorite.user_id == user_id).all()
 
     trail_names_list = []
     
     for favorite in favorites:
-        trails = db.session.query(Trail).filter(
-            Trail.trail_id == favorite.trail_id).all()
+        trails = db.session.query(Trail).filter(Trail.trail_id == favorite.trail_id).all()
         
         for trail in trails:
             if favorite.trail_id == trail.trail_id:
