@@ -24,13 +24,13 @@ User-friendly landing page
 User registration, log-in, & log-out
 <br>
 <br>
-![](static/gifs/login-out-signup.gif)
+![](static/gifs/login-out-sign-up.gif)
 <br>
 
 Search for trails by state, or by selecting a map marker
 <br>
 <br>
-![](static/gifs/search_bar.gif)
+![](static/gifs/search-bar.gif)
 <br/>
 
 Learn about the trail's details, the local weather forecast, leave reviews, favorite trails, and more!
