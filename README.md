@@ -18,49 +18,31 @@ hikeAday is a full-stack web application where you can look up National Park tra
 User-friendly landing page
 <br>
 <br>
-![](static/gifs/landing-page.gif)
+![](static/gifs/homepage.gif)
 <br>
 
 User registration, log-in, & log-out
 <br>
 <br>
-![](static/gifs/signup.gif)
+![](static/gifs/login-out-signup.gif)
 <br>
 
 Search for trails by state, or by selecting a map marker
 <br>
 <br>
-![](static/gifs/add-plant.gif)
+![](static/gifs/search_bar.gif)
 <br/>
 
-Learn about the trail's details such as length, elevation gain, features, activtites, and more!
+Learn about the trail's details, the local weather forecast, leave reviews, favorite trails, and more!
 <br>
 <br>
-![](static/gifs/entries.gif)
+![](static/gifs/trail_details.gif)
 <br/>
-
-See local weather forecast for each trail
-<br>
-<br>
-![](static/gifs/twilio.gif)
-<br>
-
-See reviews for each trails, and leave reviews if a user is logged in
-<br>
-<br>
-![](static/gifs/chat.gif)
-<br>
-
-"Favorite" a trail if a user is logged in
-<br>
-<br>
-![](static/gifs/plant-of-the-moment.gif)
-<br>
 
 Keep track of reviews and your favorite trails in the user Profile page
 <br>
 <br>
-![](static/gifs/plant-of-the-moment.gif)
+![](static/gifs/profile.gif)
 <br>
 
 
@@ -70,7 +52,7 @@ Python, Flask, SQLAlchemy, PostgreSQL, Jinja, Javascript(AJAX, JSON) <br>
 **Frontend:**
 Javascript, Bootstrap, Google Fonts, HTML5, CSS3 <br>
 **APIs:**
-Google Maps Javascript, Open Weather Map API
+Google Maps, Open Weather Map API, Bing Image Search
 
 
 
